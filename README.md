@@ -27,7 +27,7 @@ For local use, serve this folder over HTTP (for example, `python3 -m http.server
 ## Privacy and access
 
 - Anyone can read the public schedule through a database function that changes private names to “Unavailable”.
-- Visitors can submit booking requests without signing in; requests stay pending in the owner's inbox until accepted or declined. The owner inbox refreshes while the owner view is open.
+- Visitors can request a listed opening or suggest another unblocked time without signing in. Requests stay pending in the owner's inbox until accepted or declined, and the inbox refreshes while owner view is open. For an existing project, apply the guest-request migration in [`supabase/migrations/20261121_guest_time_requests.sql`](supabase/migrations/20261121_guest_time_requests.sql) in the Supabase SQL Editor.
 - Only the configured Supabase Auth user ID, associated with your GitHub sign-in, can read private event names, edit slots, or manage requests. The database enforces this with Row Level Security.
 - The Supabase publishable key is visible in the page by design. The schema does not grant public access to raw timetable or booking tables.
 - Keep the `private` schema out of Supabase's exposed API schemas. The policies use it only for an owner check. See [Supabase Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).

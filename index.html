@@ -286,7 +286,7 @@
       <section id="calendar-page">
         <div class="page-heading">
           <div><p class="eyebrow" id="page-eyebrow">Book a meeting</p><h1 id="page-title">Book a time</h1><p class="subtitle" id="page-subtitle">Choose an open time and send a request. The owner will confirm before it is booked.</p></div>
-          <div class="heading-actions" style="display:none"><button class="button" id="preview-button" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page</button><button class="button primary" id="add-slot" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14"/></svg>Add time slot</button></div>
+          <div class="heading-actions" style="display:none"><button class="button primary" id="guest-request" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16M12 12v5m-2.5-2.5h5"/></svg>Request a time</button><button class="button" id="preview-button" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page</button><button class="button primary" id="add-slot" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14"/></svg>Add time slot</button></div>
         </div>
 
         <div class="modebar" id="modebar" style="display:none">
@@ -353,7 +353,8 @@
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
       <div class="modal-head"><div><h2 id="booking-modal-title">Request this time</h2><p id="booking-slot-copy">No account needed. Add your name and email; this time is booked only after the owner accepts.</p></div><button class="close-button" data-close="booking-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
       <form id="booking-form"><input type="hidden" name="slotId" id="booking-slot-id" />
-        <div class="form-grid"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required placeholder="Name" /></div><div class="field full"><label for="booker-email">Email</label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" required placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">What would you like to discuss?</label><textarea id="booking-note" name="note" maxlength="400" placeholder="Add a short note (optional)"></textarea></div></div>
+        <div class="form-grid" id="booking-time-fields" style="display:none"><div class="field full"><label for="booking-date">Requested date</label><input id="booking-date" name="requestDate" type="date" /></div><div class="field"><label for="booking-start">Starts</label><input id="booking-start" name="requestStart" type="time" step="1800" /></div><div class="field"><label for="booking-end">Ends</label><input id="booking-end" name="requestEnd" type="time" step="1800" /></div></div>
+        <div class="form-grid" style="margin-top:13px"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required placeholder="Name" /></div><div class="field full"><label for="booker-email">Email</label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" required placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">What would you like to discuss?</label><textarea id="booking-note" name="note" maxlength="400" placeholder="Add a short note (optional)"></textarea></div></div>
         <p class="modal-error" id="booking-error"></p><div class="modal-actions"><span></span><div class="right-actions"><button class="button" type="button" data-close="booking-modal-backdrop">Cancel</button><button class="button primary" type="submit">Send request</button></div></div>
       </form>
     </section>
@@ -373,6 +374,16 @@
       const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
       const pad = n => String(n).padStart(2, '0');
       const dateKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+      function nextRequestWindow() {
+        const now = new Date();
+        let date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
+        let startMinute = Math.ceil((now.getHours() * 60 + now.getMinutes() + 1) / 30) * 30;
+        if (startMinute < START_MINUTE) startMinute = 9 * 60;
+        if (startMinute >= END_MINUTE) { date.setDate(date.getDate() + 1); startMinute = 9 * 60; }
+        const endMinute = Math.min(startMinute + 30, END_MINUTE);
+        const format = minute => `${pad(Math.floor(minute / 60))}:${pad(minute % 60)}`;
+        return { date: dateKey(date), start: format(startMinute), end: format(endMinute) };
+      }
       const fromKey = key => { const [y,m,d] = key.split('-').map(Number); return new Date(y, m - 1, d, 12); };
       const startOfWeek = date => { const result = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12); result.setDate(result.getDate() - ((result.getDay() + 6) % 7)); return result; };
       const uid = () => globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); });
@@ -542,7 +553,7 @@
       const isConfirmed = request => request.status === 'accepted';
       const dayMatches = (item, key) => item.date === key;
       const rangesOverlap = (aStart, aEnd, bStart, bEnd) => timeMinutes(aStart) < timeMinutes(bEnd) && timeMinutes(aEnd) > timeMinutes(bStart);
-      const overlapping = (date, start, end, exceptId = null) => state.slots.some(item => item.id !== exceptId && item.date === date && rangesOverlap(start, end, item.start, item.end)) || state.requests.some(item => item.status !== 'declined' && item.slotId !== exceptId && item.date === date && rangesOverlap(start, end, item.start, item.end));
+      const overlapping = (date, start, end, exceptSlotId = null, exceptRequestId = null) => state.slots.some(item => item.id !== exceptSlotId && item.date === date && rangesOverlap(start, end, item.start, item.end)) || state.requests.some(item => item.status !== 'declined' && item.slotId !== exceptSlotId && item.id !== exceptRequestId && item.date === date && rangesOverlap(start, end, item.start, item.end));
       const icon = name => ({
         lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg>',
         plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14"/></svg>'
@@ -629,7 +640,7 @@
         const hasSlots = dates.some(d => itemEventsForDay(dateKey(d)).length > 0);
         const hasBookableTime = dates.some(d => itemEventsForDay(dateKey(d)).some(item => item.kind === 'availability' && !isPastSlot(item.date, item.start)));
         $('#empty-banner').hidden = visitorMode ? hasBookableTime : hasSlots;
-        $('#empty-banner').textContent = visitorMode ? 'No bookable times this week. The owner needs to publish a future time as “Open for booking” first. Guests can request it here without an account or sign-in.' : 'Your timetable is clear. Add a personal event or create an open time for people to request.';
+        $('#empty-banner').textContent = visitorMode ? 'No listed openings this week. Use “Request a time” to suggest a free time anyway; it stays pending until the owner reviews it.' : 'Your timetable is clear. Add a personal event or create an open time for people to request.';
         $('#legend').innerHTML = visitorMode ? '<span class="legend-item"><i class="legend-swatch available"></i>Available to request</span><span class="legend-item"><i class="legend-swatch private"></i>Unavailable</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>' : '<span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>';
         updateRequestCounts();
       }
@@ -682,13 +693,14 @@
         $('#mode-note').innerHTML = value ? (ownerView ? 'This preview shows the public view' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>Click an available time to request it') : `${icon('lock')}Only you can see private slot names`;
         $('#add-slot').style.display = ownerView && !value ? 'inline-flex' : 'none';
         $('#preview-button').style.display = ownerView ? 'inline-flex' : 'none';
-        $('.heading-actions').style.display = ownerView ? 'flex' : 'none';
+        $('.heading-actions').style.display = 'flex';
         $('.below-grid').style.display = ownerView && !value ? 'grid' : 'none';
         $('#nav-requests').style.display = ownerView ? 'flex' : 'none';
         $('#nav-calendar-label').textContent = ownerView ? 'My timetable' : 'Booking page';
         $('#page-title').textContent = publicVisitor ? 'Book a time' : value ? 'Visitor preview' : 'My timetable';
         $('#page-eyebrow').textContent = publicVisitor ? 'Book a meeting' : value ? 'Public view' : 'Your week at a glance';
-        $('#page-subtitle').textContent = publicVisitor ? 'Choose an open time and send a request. No account is needed; the owner will confirm before it is booked.' : value ? 'This is the public schedule guests see. Private time only appears as unavailable.' : 'Plan your time, set what others can see, and make room for good conversations.';
+        $('#page-subtitle').textContent = publicVisitor ? 'No account or sign-in needed. Choose a listed opening or request another free time; the owner will confirm before it is booked.' : value ? 'This is the public schedule guests see. Private time only appears as unavailable.' : 'Plan your time, set what others can see, and make room for good conversations.';
+        $('#guest-request').style.display = publicVisitor ? 'inline-flex' : 'none';
         $('#preview-button').innerHTML = value ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m19 12-7 7-7-7m7 7V5"/></svg>Back to my view' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page';
         renderCalendar();
         return true;
@@ -717,13 +729,25 @@
         $('#slot-title').required = !availability;
         $('#visibility-field').hidden = availability;
       }
-      function openBookingModal(slot) {
+      function openBookingModal(slot = null) {
         if (!supabase) { toast('Online booking is not connected yet.'); return; }
-        bookingTargetId = slot.id;
+        bookingTargetId = slot?.id || null;
         $('#booking-form').reset();
-        $('#booking-slot-id').value = slot.id;
+        $('#booking-slot-id').value = slot?.id || '';
         $('#booking-error').classList.remove('show');
-        $('#booking-slot-copy').textContent = `${formatDate(slot.date)} · ${formatTime(slot.start)} – ${formatTime(slot.end)}. No account needed; share your name and email so the owner can respond. The time is booked only after acceptance.`;
+        const timeFields = $('#booking-time-fields');
+        timeFields.style.display = slot ? 'none' : 'grid';
+        ['booking-date', 'booking-start', 'booking-end'].forEach(id => { $(`#${id}`).required = !slot; });
+        if (slot) {
+          $('#booking-slot-copy').textContent = `${formatDate(slot.date)} · ${formatTime(slot.start)} – ${formatTime(slot.end)}. No account needed; share your name and email so the owner can respond. The time is booked only after acceptance.`;
+        } else {
+          const suggested = nextRequestWindow();
+          $('#booking-date').min = dateKey(new Date());
+          $('#booking-date').value = suggested.date;
+          $('#booking-start').value = suggested.start;
+          $('#booking-end').value = suggested.end;
+          $('#booking-slot-copy').textContent = 'No account needed. Suggest a free time; your request stays pending until the owner accepts it.';
+        }
         $('#booking-modal-backdrop').classList.add('open');
         setTimeout(() => $('#booker-name').focus(), 40);
       }
@@ -819,6 +843,7 @@
       $('#next-week').addEventListener('click', () => { week.setDate(week.getDate() + 7); renderCalendar(); });
       $('#today-button').addEventListener('click', () => { week = startOfWeek(new Date()); renderCalendar(); });
       $('#add-slot').addEventListener('click', () => openSlotModal());
+      $('#guest-request').addEventListener('click', () => openBookingModal());
       $('#preview-button').addEventListener('click', () => setVisitorMode(!visitorMode));
       $('#owner-mode').addEventListener('click', () => setVisitorMode(false));
       $('#visitor-mode').addEventListener('click', () => setVisitorMode(true));
@@ -873,14 +898,31 @@
       $('#booking-form').addEventListener('submit', async event => {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
-        const slot = state.slots.find(item => item.id === bookingTargetId && item.kind === 'availability');
-        if (!slot) { showError('#booking-error', 'This time is no longer available.'); return; }
-        if (isPastSlot(slot.date, slot.start)) { showError('#booking-error', 'This time has already passed.'); return; }
-        if (overlapping(slot.date, slot.start, slot.end, slot.id)) { showError('#booking-error', 'This time is no longer available.'); return; }
         const name = String(form.get('name')).trim(), email = String(form.get('email')).trim();
         if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('#booking-error', 'Enter your name and a valid email address.'); return; }
-        const { error } = await supabase.rpc('request_booking', { p_slot_id: slot.id, p_name: name, p_email: email, p_note: String(form.get('note') || '').trim() });
-        if (error) { showError('#booking-error', 'This time is no longer available. Refresh the page and choose another time.'); await loadPublicSchedule(); return; }
+        const slotId = String(form.get('slotId') || '');
+        const note = String(form.get('note') || '').trim();
+        let rpcName, rpcArgs, date, start, end;
+        if (slotId) {
+          const slot = state.slots.find(item => item.id === slotId && item.kind === 'availability');
+          if (!slot) { showError('#booking-error', 'This time is no longer available. Refresh and choose another time.'); return; }
+          ({ date, start, end } = slot);
+          if (isPastSlot(date, start) || overlapping(date, start, end, slot.id)) { showError('#booking-error', 'This time is no longer available. Refresh and choose another time.'); return; }
+          rpcName = 'request_booking';
+          rpcArgs = { p_slot_id: slot.id, p_name: name, p_email: email, p_note: note };
+        } else {
+          date = String(form.get('requestDate') || '');
+          start = String(form.get('requestStart') || '');
+          end = String(form.get('requestEnd') || '');
+          if (!date || !start || !end || timeMinutes(end) <= timeMinutes(start)) { showError('#booking-error', 'Choose a date and an end time after the start time.'); return; }
+          if (timeMinutes(start) < START_MINUTE || timeMinutes(end) > END_MINUTE) { showError('#booking-error', 'Requests must be between 8:00 AM and 8:00 PM.'); return; }
+          if (isPastSlot(date, start)) { showError('#booking-error', 'Choose a future time.'); return; }
+          if (overlapping(date, start, end)) { showError('#booking-error', 'That time overlaps something on the schedule. Choose another time.'); return; }
+          rpcName = 'request_time';
+          rpcArgs = { p_slot_date: date, p_start_time: start, p_end_time: end, p_name: name, p_email: email, p_note: note };
+        }
+        const { error } = await supabase.rpc(rpcName, rpcArgs);
+        if (error) { showError('#booking-error', 'That time is no longer available. Refresh and choose a different time.'); await loadPublicSchedule(); return; }
         closeModal('booking-modal-backdrop'); await loadPublicSchedule(); toast('Request sent — waiting for approval');
       });
 
@@ -892,7 +934,7 @@
           const request = state.requests.find(r => r.id === accept.dataset.accept && isPending(r));
           if (!request) return;
           if (isPastSlot(request.date, request.start)) { toast('This request is for a time that has already passed.'); return; }
-          if (overlapping(request.date, request.start, request.end, request.slotId)) { toast('This booking conflicts with another time slot.'); return; }
+          if (overlapping(request.date, request.start, request.end, request.slotId, request.id)) { toast('This booking conflicts with another time slot.'); return; }
           request.status = 'accepted';
           if (!await save()) return;
           renderRequests(); renderCalendar(); toast('Booking accepted and added to your timetable');
