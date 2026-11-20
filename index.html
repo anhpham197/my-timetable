@@ -100,7 +100,7 @@
     .day-head-cell .date-number { display: inline-grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; color: #4d5a72; margin-top: 5px; font-size: 11px; letter-spacing: 0; }
     .day-head-cell.today { color: var(--blue); }
     .day-head-cell.today .date-number { background: var(--blue); color: white; }
-    .calendar-body { display: grid; grid-template-columns: 65px repeat(7, minmax(0,1fr)); height: 768px; }
+    .calendar-body { display: grid; grid-template-columns: 65px repeat(7, minmax(0,1fr)); }
     .time-rail { position: relative; border-right: 1px solid var(--line); background: #fdfdfe; }
     .hour-label { position: absolute; right: 8px; transform: translateY(-50%); font-size: 9px; color: #9ba4b3; white-space: nowrap; }
     .hour-label:first-child { transform: none; }
@@ -191,6 +191,7 @@
     .field { display: grid; gap: 6px; }
     .field.full { grid-column: 1 / -1; }
     .field label { color: #667288; font-size: 10px; font-weight: 650; }
+    .optional-label { color: #929baa; font-weight: 500; }
     .field input, .field textarea, .field select { width: 100%; min-height: 36px; border: 1px solid #e0e5ed; border-radius: 7px; outline: 0; padding: 8px 10px; color: #3f4b60; background: white; font-size: 11px; }
     .field textarea { min-height: 74px; resize: vertical; line-height: 1.5; }
     .field input:focus, .field textarea:focus, .field select:focus { border-color: #d29aab; box-shadow: 0 0 0 3px rgba(141,41,71,.1); }
@@ -336,8 +337,8 @@
         <div class="form-grid">
           <div class="field full" id="slot-title-field"><label for="slot-title">Name</label><input id="slot-title" name="title" maxlength="60" placeholder="e.g. Project focus" required /></div>
           <div class="field"><label for="slot-date">Date</label><input type="date" id="slot-date" name="date" required /></div>
-          <div class="field"><label for="slot-start">Starts</label><input type="time" id="slot-start" name="start" value="09:00" step="1800" required /></div>
-          <div class="field"><label for="slot-end">Ends</label><input type="time" id="slot-end" name="end" value="10:00" step="1800" required /></div>
+          <div class="field"><label for="slot-start">Starts</label><select id="slot-start" name="start" required></select></div>
+          <div class="field"><label for="slot-end">Ends</label><select id="slot-end" name="end" required></select></div>
           <div class="field full" id="visibility-field"><label>Who can see this slot?</label><div class="visibility-options">
             <div class="visibility-option"><input type="radio" name="visibility" value="public" id="visibility-public" checked><label for="visibility-public"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18m0-18a14 14 0 0 0 0 18"/></svg><span><strong>Public</strong><span>Others can see the name</span></span></label></div>
             <div class="visibility-option"><input type="radio" name="visibility" value="private" id="visibility-private"><label for="visibility-private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg><span><strong>Private</strong><span>Others only see unavailable</span></span></label></div>
@@ -351,10 +352,10 @@
 
   <div class="modal-backdrop" id="booking-modal-backdrop" role="presentation">
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
-      <div class="modal-head"><div><h2 id="booking-modal-title">Request this time</h2><p id="booking-slot-copy">No account needed. Add your name and email; this time is booked only after the owner accepts.</p></div><button class="close-button" data-close="booking-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
+      <div class="modal-head"><div><h2 id="booking-modal-title">Request this time</h2><p id="booking-slot-copy">No account needed. Add your name, phone, and a short message; email is optional.</p></div><button class="close-button" data-close="booking-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
       <form id="booking-form"><input type="hidden" name="slotId" id="booking-slot-id" />
-        <div class="form-grid" id="booking-time-fields" style="display:none"><div class="field full"><label for="booking-date">Requested date</label><input id="booking-date" name="requestDate" type="date" /></div><div class="field"><label for="booking-start">Starts</label><input id="booking-start" name="requestStart" type="time" step="1800" /></div><div class="field"><label for="booking-end">Ends</label><input id="booking-end" name="requestEnd" type="time" step="1800" /></div></div>
-        <div class="form-grid" style="margin-top:13px"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required placeholder="Name" /></div><div class="field full"><label for="booker-email">Email</label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" required placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">What would you like to discuss?</label><textarea id="booking-note" name="note" maxlength="400" placeholder="Add a short note (optional)"></textarea></div></div>
+        <div class="form-grid" id="booking-time-fields" style="display:none"><div class="field full"><label for="booking-date">Requested date</label><input id="booking-date" name="requestDate" type="date" /></div><div class="field"><label for="booking-start">Starts</label><select id="booking-start" name="requestStart"></select></div><div class="field"><label for="booking-end">Ends</label><select id="booking-end" name="requestEnd"></select></div></div>
+        <div class="form-grid" style="margin-top:13px"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required placeholder="Name" /></div><div class="field full"><label for="booker-phone">Your phone</label><input id="booker-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" minlength="7" maxlength="32" required placeholder="+84 912 345 678" /></div><div class="field full"><label for="booker-email">Email <span class="optional-label">(optional)</span></label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">Short message</label><textarea id="booking-note" name="note" maxlength="300" required placeholder="What would you like to discuss? (up to 300 characters)"></textarea></div></div>
         <p class="modal-error" id="booking-error"></p><div class="modal-actions"><span></span><div class="right-actions"><button class="button" type="button" data-close="booking-modal-backdrop">Cancel</button><button class="button primary" type="submit">Send request</button></div></div>
       </form>
     </section>
@@ -364,26 +365,15 @@
   <script src="./supabase-config.js"></script>
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+    import { DAY_START_MINUTE, DAY_END_MINUTE, nextRequestWindow, rangesOverlap, timeMinutes, timeOptions, validateRequestContact, validateTimeRange } from './timetable-rules.mjs';
     (() => {
       const PX_PER_MINUTE = 32 / 30;
-      const START_MINUTE = 8 * 60;
-      const END_MINUTE = 20 * 60;
       const HCMC_TIME = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Ho_Chi_Minh', hour: 'numeric', minute: '2-digit' });
       const HCMC_CLOCK = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
       const pad = n => String(n).padStart(2, '0');
       const dateKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-      function nextRequestWindow() {
-        const now = new Date();
-        let date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
-        let startMinute = Math.ceil((now.getHours() * 60 + now.getMinutes() + 1) / 30) * 30;
-        if (startMinute < START_MINUTE) startMinute = 9 * 60;
-        if (startMinute >= END_MINUTE) { date.setDate(date.getDate() + 1); startMinute = 9 * 60; }
-        const endMinute = Math.min(startMinute + 30, END_MINUTE);
-        const format = minute => `${pad(Math.floor(minute / 60))}:${pad(minute % 60)}`;
-        return { date: dateKey(date), start: format(startMinute), end: format(endMinute) };
-      }
       const fromKey = key => { const [y,m,d] = key.split('-').map(Number); return new Date(y, m - 1, d, 12); };
       const startOfWeek = date => { const result = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12); result.setDate(result.getDate() - ((result.getDay() + 6) % 7)); return result; };
       const uid = () => globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); });
@@ -414,11 +404,10 @@
         clock.dateTime = now.toISOString();
         setTimeout(updateHeaderClock, 60000 - now.getSeconds() * 1000 - now.getMilliseconds() + 20);
       }
-      const timeMinutes = value => { const [h,m] = value.split(':').map(Number); return h * 60 + m; };
       const dbTime = value => String(value || '').slice(0, 5);
       const slotFromRow = row => ({ id: row.id, kind: row.kind, title: row.title, date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility });
       const slotToRow = slot => ({ id: slot.id, kind: slot.kind, title: slot.title, slot_date: slot.date, start_time: slot.start, end_time: slot.end, visibility: slot.visibility });
-      const requestFromRow = row => ({ id: row.id, slotId: row.slot_id, availabilityTitle: row.availability_title, name: row.name, email: row.email, note: row.note || '', date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), status: row.status, createdAt: row.created_at });
+      const requestFromRow = row => ({ id: row.id, slotId: row.slot_id, availabilityTitle: row.availability_title, name: row.name, phone: row.phone || '', email: row.email || '', note: row.note || '', date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), status: row.status, createdAt: row.created_at });
       const save = async () => {
         if (!supabase || !ownerAuthenticated || !ownerView) return false;
         const slots = state.slots.map(slotToRow);
@@ -547,12 +536,22 @@
       }
       const isPastSlot = (date, time) => { const now = Object.fromEntries(HCMC_CLOCK.formatToParts(new Date()).map(part => [part.type, part.value])); const today = `${now.year}-${now.month}-${now.day}`; const currentMinute = Number(now.hour) * 60 + Number(now.minute); return date < today || date === today && timeMinutes(time) <= currentMinute; };
       const formatTime = value => { const [h,m] = value.split(':').map(Number); const d = new Date(2000, 0, 1, h, m); return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: m ? '2-digit' : undefined }); };
+      function populateTimeSelect(selector, end, selected) {
+        const select = $(selector);
+        select.innerHTML = timeOptions({ end }).map(value => `<option value="${value}">${formatTime(value)}${value === '24:00' ? ' (midnight)' : ''}</option>`).join('');
+        select.value = selected;
+      }
+      function initializeTimeSelects() {
+        populateTimeSelect('#slot-start', false, '09:00');
+        populateTimeSelect('#slot-end', true, '10:00');
+        populateTimeSelect('#booking-start', false, '09:00');
+        populateTimeSelect('#booking-end', true, '09:30');
+      }
       const formatDate = (key, options = { weekday: 'long', month: 'long', day: 'numeric' }) => fromKey(key).toLocaleDateString('en-US', options);
       const slotEnd = slot => timeMinutes(slot.end);
       const isPending = request => request.status === 'pending';
       const isConfirmed = request => request.status === 'accepted';
       const dayMatches = (item, key) => item.date === key;
-      const rangesOverlap = (aStart, aEnd, bStart, bEnd) => timeMinutes(aStart) < timeMinutes(bEnd) && timeMinutes(aEnd) > timeMinutes(bStart);
       const overlapping = (date, start, end, exceptSlotId = null, exceptRequestId = null) => state.slots.some(item => item.id !== exceptSlotId && item.date === date && rangesOverlap(start, end, item.start, item.end)) || state.requests.some(item => item.status !== 'declined' && item.slotId !== exceptSlotId && item.id !== exceptRequestId && item.date === date && rangesOverlap(start, end, item.start, item.end));
       const icon = name => ({
         lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg>',
@@ -598,8 +597,8 @@
           return `<div class="day-head-cell ${today ? 'today' : ''}">${date.toLocaleDateString('en-US', { weekday: 'short' })}<br><span class="date-number">${date.getDate()}</span></div>`;
         }).join('');
         let body = '<div class="time-rail">';
-        for (let hour = 8; hour <= 20; hour++) {
-          const top = (hour * 60 - START_MINUTE) * PX_PER_MINUTE;
+        for (let hour = 0; hour < 24; hour++) {
+          const top = hour * 60 * PX_PER_MINUTE;
           body += `<span class="hour-label" style="top:${top}px">${new Date(2000,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'})}</span>`;
         }
         body += '</div>';
@@ -608,9 +607,9 @@
           body += `<div class="day-column ${today ? 'today-column' : ''}" data-date="${key}">`;
           for (const item of itemEventsForDay(key)) {
             const start = timeMinutes(item.start), end = slotEnd(item);
-            if (end <= START_MINUTE || start >= END_MINUTE) continue;
-            const top = Math.max(0, (start - START_MINUTE) * PX_PER_MINUTE);
-            const height = Math.max(31, Math.min(END_MINUTE, end) - Math.max(START_MINUTE, start)) * PX_PER_MINUTE;
+            if (end <= DAY_START_MINUTE || start >= DAY_END_MINUTE) continue;
+            const top = Math.max(0, (start - DAY_START_MINUTE) * PX_PER_MINUTE);
+            const height = Math.max(31, Math.min(DAY_END_MINUTE, end) - Math.max(DAY_START_MINUTE, start)) * PX_PER_MINUTE;
             const styleHeight = Math.max(31, height);
             const info = eventText(item);
             const available = item.kind === 'availability';
@@ -627,12 +626,13 @@
             body += `<article class="calendar-event ${extra} ${clickable ? 'public-view' : ''}" style="top:${top}px;height:${styleHeight}px" ${dataAttrs} tabindex="${clickable || editable || item.kind === 'pending' && !visitorMode ? '0' : '-1'}" aria-label="${escapeHtml(info.title)}, ${escapeHtml(info.sub)}"><strong>${escapeHtml(info.title)}</strong><span>${escapeHtml(info.sub)}</span></article>`;
           }
           const now = new Date();
-          if (key === todayKey && now.getHours() >= 8 && now.getHours() < 20) {
-            const top = (now.getHours() * 60 + now.getMinutes() - START_MINUTE) * PX_PER_MINUTE;
+          if (key === todayKey) {
+            const top = (now.getHours() * 60 + now.getMinutes() - DAY_START_MINUTE) * PX_PER_MINUTE;
             body += `<div class="now-line" style="top:${top}px"></div>`;
           }
           body += '</div>';
         });
+        $('#calendar-body').style.height = `${(DAY_END_MINUTE - DAY_START_MINUTE) * PX_PER_MINUTE}px`;
         $('#calendar-body').innerHTML = body;
         const weekSlots = state.slots.filter(slot => dates.some(d => dateKey(d) === slot.date) && !(slot.kind === 'availability' && state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))));
         $('#stat-slots').textContent = String(weekSlots.length + state.requests.filter(r => r.status === 'accepted' && dates.some(d => dateKey(d) === r.date)).length);
@@ -660,8 +660,9 @@
       function requestCard(request, confirmed = false) {
         const status = confirmed ? '<span class="status-pill" style="color:#36816d;background:#e8f6f1">Confirmed</span>' : '<span class="status-pill">Awaiting response</span>';
         const actions = confirmed ? `<div class="request-actions"><button class="button danger" data-cancel-booking="${request.id}">Cancel booking</button></div>` : `<div class="request-actions"><button class="button" data-decline="${request.id}">Decline</button><button class="button primary" data-accept="${request.id}">Accept</button></div>`;
+        const contact = `<p class="request-note">Phone: ${escapeHtml(request.phone || 'Not provided')}</p>${request.email ? `<p class="request-note">Email: ${escapeHtml(request.email)}</p>` : ''}`;
         const note = request.note ? `<p class="request-note">“${escapeHtml(request.note)}”</p>` : '';
-        return `<article class="request-card"><div class="avatar">${escapeHtml(initials(request.name))}</div><div><div class="request-meta"><strong>${escapeHtml(request.name)}</strong>${status}</div><div class="request-time">${escapeHtml(formatDate(request.date))} · ${escapeHtml(formatTime(request.start))} – ${escapeHtml(formatTime(request.end))}</div><p class="request-note">${escapeHtml(request.email)}</p>${note}</div>${actions}</article>`;
+        return `<article class="request-card"><div class="avatar">${escapeHtml(initials(request.name))}</div><div><div class="request-meta"><strong>${escapeHtml(request.name)}</strong>${status}</div><div class="request-time">${escapeHtml(formatDate(request.date))} · ${escapeHtml(formatTime(request.start))} – ${escapeHtml(formatTime(request.end))}</div>${contact}${note}</div>${actions}</article>`;
       }
       function renderRequests() {
         const pending = state.requests.filter(isPending).sort((a,b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start));
@@ -739,14 +740,14 @@
         timeFields.style.display = slot ? 'none' : 'grid';
         ['booking-date', 'booking-start', 'booking-end'].forEach(id => { $(`#${id}`).required = !slot; });
         if (slot) {
-          $('#booking-slot-copy').textContent = `${formatDate(slot.date)} · ${formatTime(slot.start)} – ${formatTime(slot.end)}. No account needed; share your name and email so the owner can respond. The time is booked only after acceptance.`;
+          $('#booking-slot-copy').textContent = `${formatDate(slot.date)} · ${formatTime(slot.start)} – ${formatTime(slot.end)}. No account needed; your name, phone, and short message are required. Email is optional.`;
         } else {
           const suggested = nextRequestWindow();
           $('#booking-date').min = dateKey(new Date());
           $('#booking-date').value = suggested.date;
           $('#booking-start').value = suggested.start;
           $('#booking-end').value = suggested.end;
-          $('#booking-slot-copy').textContent = 'No account needed. Suggest a free time; your request stays pending until the owner accepts it.';
+          $('#booking-slot-copy').textContent = 'No account needed. Suggest a free time; your request stays pending until the owner accepts it. Name, phone, and a short message are required; email is optional.';
         }
         $('#booking-modal-backdrop').classList.add('open');
         setTimeout(() => $('#booker-name').focus(), 40);
@@ -878,8 +879,7 @@
         const kind = form.get('kind');
         const slot = { id: editingSlotId || uid(), kind, title: kind === 'availability' ? 'Open for booking' : String(form.get('title')).trim(), date: form.get('date'), start: form.get('start'), end: form.get('end'), visibility: kind === 'availability' ? 'public' : form.get('visibility') };
         const error = $('#slot-error'); error.classList.remove('show');
-        if (!slot.date || !slot.start || !slot.end || timeMinutes(slot.end) <= timeMinutes(slot.start)) { showError('#slot-error', 'Choose an end time after the start time.'); return; }
-        if (timeMinutes(slot.start) < START_MINUTE || timeMinutes(slot.end) > END_MINUTE) { showError('#slot-error', 'Slots must be between 8:00 AM and 8:00 PM.'); return; }
+        if (!slot.date || !validateTimeRange(slot.start, slot.end)) { showError('#slot-error', 'Choose a valid time range within the day.'); return; }
         if (kind === 'availability' && isPastSlot(slot.date, slot.start)) { showError('#slot-error', 'Booking availability must start in the future.'); return; }
         if (overlapping(slot.date, slot.start, slot.end, editingSlotId)) { showError('#slot-error', 'This time overlaps another slot or booking. Choose a different time.'); return; }
         if (editingSlotId) state.slots = state.slots.map(item => item.id === editingSlotId ? slot : item);
@@ -898,10 +898,10 @@
       $('#booking-form').addEventListener('submit', async event => {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
-        const name = String(form.get('name')).trim(), email = String(form.get('email')).trim();
-        if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('#booking-error', 'Enter your name and a valid email address.'); return; }
+        const contact = validateRequestContact({ name: form.get('name'), phone: form.get('phone'), email: form.get('email'), note: form.get('note') });
+        if (!contact.valid) { showError('#booking-error', contact.error); return; }
+        const { name, phone, email, note } = contact.value;
         const slotId = String(form.get('slotId') || '');
-        const note = String(form.get('note') || '').trim();
         let rpcName, rpcArgs, date, start, end;
         if (slotId) {
           const slot = state.slots.find(item => item.id === slotId && item.kind === 'availability');
@@ -909,17 +909,17 @@
           ({ date, start, end } = slot);
           if (isPastSlot(date, start) || overlapping(date, start, end, slot.id)) { showError('#booking-error', 'This time is no longer available. Refresh and choose another time.'); return; }
           rpcName = 'request_booking';
-          rpcArgs = { p_slot_id: slot.id, p_name: name, p_email: email, p_note: note };
+          rpcArgs = { p_slot_id: slot.id, p_name: name, p_phone: phone, p_email: email, p_note: note };
         } else {
           date = String(form.get('requestDate') || '');
           start = String(form.get('requestStart') || '');
           end = String(form.get('requestEnd') || '');
-          if (!date || !start || !end || timeMinutes(end) <= timeMinutes(start)) { showError('#booking-error', 'Choose a date and an end time after the start time.'); return; }
-          if (timeMinutes(start) < START_MINUTE || timeMinutes(end) > END_MINUTE) { showError('#booking-error', 'Requests must be between 8:00 AM and 8:00 PM.'); return; }
+          if (!date || !validateTimeRange(start, end)) { showError('#booking-error', 'Choose a date and a valid time range within the day.'); return; }
+          if (timeMinutes(start) < DAY_START_MINUTE || timeMinutes(end) > DAY_END_MINUTE) { showError('#booking-error', 'Requests must fit within one calendar day.'); return; }
           if (isPastSlot(date, start)) { showError('#booking-error', 'Choose a future time.'); return; }
           if (overlapping(date, start, end)) { showError('#booking-error', 'That time overlaps something on the schedule. Choose another time.'); return; }
           rpcName = 'request_time';
-          rpcArgs = { p_slot_date: date, p_start_time: start, p_end_time: end, p_name: name, p_email: email, p_note: note };
+          rpcArgs = { p_slot_date: date, p_start_time: start, p_end_time: end, p_name: name, p_phone: phone, p_email: email, p_note: note };
         }
         const { error } = await supabase.rpc(rpcName, rpcArgs);
         if (error) { showError('#booking-error', 'That time is no longer available. Refresh and choose a different time.'); await loadPublicSchedule(); return; }
@@ -952,6 +952,7 @@
         }
       });
 
+      initializeTimeSelects();
       updateHeaderClock();
       renderCalendar();
       setVisitorMode(true, false);

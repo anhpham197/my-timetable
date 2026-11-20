@@ -20,14 +20,16 @@ The page uses Supabase Auth and Postgres with Row Level Security. GitHub Pages s
    on conflict (singleton) do update set owner_id = excluded.owner_id;
    ```
 
-8. Choose **Owner sign in** again. That sign-in opens your owner timetable; future visits still start on the public schedule until you choose **Owner sign in**. Visitors can request an open time without an account by providing their name and email.
+8. Choose **Owner sign in** again. That sign-in opens your owner timetable; future visits still start on the public schedule until you choose **Owner sign in**. Visitors can request an open time without an account. Their name, phone number, and short message are required; email is optional.
 
 For local use, serve this folder over HTTP (for example, `python3 -m http.server 8000`) and open `http://localhost:8000`.
+
+Run the timetable rule tests with `node --test`.
 
 ## Privacy and access
 
 - Anyone can read the public schedule through a database function that changes private names to “Unavailable”.
-- Visitors can request a listed opening or suggest another unblocked time without signing in. Requests stay pending in the owner's inbox until accepted or declined, and the inbox refreshes while owner view is open. For an existing project, apply the guest-request migration in [`supabase/migrations/20261121_guest_time_requests.sql`](supabase/migrations/20261121_guest_time_requests.sql) in the Supabase SQL Editor.
+- The calendar shows the full day, midnight to midnight. Visitors can request a listed opening or suggest another unblocked time without signing in. Requests stay pending in the owner's inbox until accepted or declined, and the inbox refreshes while owner view is open. For an existing project, apply [`supabase/migrations/20261121_full_day_contact_fields.sql`](supabase/migrations/20261121_full_day_contact_fields.sql) in the Supabase SQL Editor. The earlier guest-request migration is only needed if that project has not already had it applied.
 - Only the configured Supabase Auth user ID, associated with your GitHub sign-in, can read private event names, edit slots, or manage requests. The database enforces this with Row Level Security.
 - The Supabase publishable key is visible in the page by design. The schema does not grant public access to raw timetable or booking tables.
 - Keep the `private` schema out of Supabase's exposed API schemas. The policies use it only for an owner check. See [Supabase Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
