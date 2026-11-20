@@ -629,7 +629,7 @@
         const hasSlots = dates.some(d => itemEventsForDay(dateKey(d)).length > 0);
         const hasBookableTime = dates.some(d => itemEventsForDay(dateKey(d)).some(item => item.kind === 'availability' && !isPastSlot(item.date, item.start)));
         $('#empty-banner').hidden = visitorMode ? hasBookableTime : hasSlots;
-        $('#empty-banner').textContent = visitorMode ? 'There are no times to book this week. Check another week or come back later.' : 'Your timetable is clear. Add a personal event or create an open time for people to request.';
+        $('#empty-banner').textContent = visitorMode ? 'No bookable times this week. The owner needs to publish a future time as “Open for booking” first. Guests can request it here without an account or sign-in.' : 'Your timetable is clear. Add a personal event or create an open time for people to request.';
         $('#legend').innerHTML = visitorMode ? '<span class="legend-item"><i class="legend-swatch available"></i>Available to request</span><span class="legend-item"><i class="legend-swatch private"></i>Unavailable</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>' : '<span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>';
         updateRequestCounts();
       }
