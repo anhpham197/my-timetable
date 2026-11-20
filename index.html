@@ -351,7 +351,7 @@
 
   <div class="modal-backdrop" id="booking-modal-backdrop" role="presentation">
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
-      <div class="modal-head"><div><h2 id="booking-modal-title">Request this time</h2><p id="booking-slot-copy">Send a request. This time is only added after it's accepted.</p></div><button class="close-button" data-close="booking-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
+      <div class="modal-head"><div><h2 id="booking-modal-title">Request this time</h2><p id="booking-slot-copy">No account needed. Add your name and email; this time is booked only after the owner accepts.</p></div><button class="close-button" data-close="booking-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
       <form id="booking-form"><input type="hidden" name="slotId" id="booking-slot-id" />
         <div class="form-grid"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required placeholder="Name" /></div><div class="field full"><label for="booker-email">Email</label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" required placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">What would you like to discuss?</label><textarea id="booking-note" name="note" maxlength="400" placeholder="Add a short note (optional)"></textarea></div></div>
         <p class="modal-error" id="booking-error"></p><div class="modal-actions"><span></span><div class="right-actions"><button class="button" type="button" data-close="booking-modal-backdrop">Cancel</button><button class="button primary" type="submit">Send request</button></div></div>
@@ -384,13 +384,16 @@
       let week = startOfWeek(new Date());
       let visitorMode = true;
       let ownerAuthenticated = false;
+      let ownerView = false;
       let ownerIdentity = '';
       let applyingSession = 0;
       let persistedSlotIds = new Set();
       let editingSlotId = null;
       let snackbarTimer;
+      let inboxPollTimer;
       let bookingTargetId = null;
       let activeSessionKey = 'not-loaded';
+      let ownerViewIntent = sessionStorage.getItem('timetable-owner-view-after-signin') === '1';
 
       const toast = message => { const el = $('#snackbar'); el.textContent = message; el.classList.add('show'); clearTimeout(snackbarTimer); snackbarTimer = setTimeout(() => el.classList.remove('show'), 2800); };
       function updateHeaderClock() {
@@ -406,7 +409,7 @@
       const slotToRow = slot => ({ id: slot.id, kind: slot.kind, title: slot.title, slot_date: slot.date, start_time: slot.start, end_time: slot.end, visibility: slot.visibility });
       const requestFromRow = row => ({ id: row.id, slotId: row.slot_id, availabilityTitle: row.availability_title, name: row.name, email: row.email, note: row.note || '', date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), status: row.status, createdAt: row.created_at });
       const save = async () => {
-        if (!supabase || !ownerAuthenticated) return false;
+        if (!supabase || !ownerAuthenticated || !ownerView) return false;
         const slots = state.slots.map(slotToRow);
         const removedSlots = [...persistedSlotIds].filter(id => !state.slots.some(slot => slot.id === id));
         try {
@@ -432,14 +435,14 @@
       function updateAuthButton() {
         const button = $('#auth-button');
         const identity = $('#auth-identity');
-        if (ownerAuthenticated) {
+        if (ownerView) {
           button.textContent = 'Sign out';
           button.title = `Sign out ${ownerIdentity ? `(${ownerIdentity})` : ''}`;
           identity.textContent = ownerIdentity ? `Owner · ${ownerIdentity}` : 'Owner view';
           identity.hidden = false;
         } else {
           button.textContent = 'Owner sign in';
-          button.title = 'Sign in with GitHub to manage your timetable';
+          button.title = ownerAuthenticated ? 'Open your private timetable' : 'Sign in with GitHub to manage your timetable';
           identity.textContent = '';
           identity.hidden = true;
         }
@@ -452,6 +455,7 @@
         const button = $('#auth-button');
         button.disabled = true;
         button.textContent = 'Opening GitHub…';
+        sessionStorage.setItem('timetable-owner-view-after-signin', '1');
         const redirect = new URL(window.location.href);
         redirect.hash = '';
         redirect.search = '';
@@ -463,6 +467,8 @@
           if (!error) return;
           throw error;
         } catch (error) {
+          sessionStorage.removeItem('timetable-owner-view-after-signin');
+          ownerViewIntent = false;
           button.disabled = false;
           updateAuthButton();
           toast(`Could not start GitHub sign-in: ${error?.message || 'Please try again.'}`);
@@ -481,6 +487,21 @@
         }
         renderCalendar();
       }
+      async function enterOwnerView() {
+        if (!ownerAuthenticated) { await signInOwner(); return; }
+        const button = $('#auth-button');
+        button.disabled = true;
+        button.textContent = 'Loading your timetable…';
+        const loaded = await loadOwnerData();
+        if (loaded) {
+          ownerView = true;
+          setPage('calendar');
+          setVisitorMode(false, false);
+          syncInboxRefresh();
+        }
+        button.disabled = false;
+        updateAuthButton();
+      }
       async function loadOwnerData() {
         if (!supabase || !ownerAuthenticated) return false;
         const [slotResult, requestResult] = await Promise.all([
@@ -497,6 +518,21 @@
         setConnectionNotice('', '', false);
         renderCalendar(); renderRequests();
         return true;
+      }
+      async function refreshOwnerInbox() {
+        if (!supabase || !ownerView) return;
+        const { data, error } = await supabase.from('booking_requests').select('*');
+        if (error) { console.error('Booking request refresh failed', error); return; }
+        const previousIds = new Set(state.requests.map(request => request.id));
+        state.requests = (data || []).map(requestFromRow);
+        renderRequests();
+        if ($('#calendar-page').style.display !== 'none') renderCalendar();
+        const newRequests = state.requests.filter(request => isPending(request) && !previousIds.has(request.id));
+        if (newRequests.length) toast(`${newRequests.length} new booking ${newRequests.length === 1 ? 'request' : 'requests'} to review`);
+      }
+      function syncInboxRefresh() {
+        clearInterval(inboxPollTimer);
+        inboxPollTimer = ownerView ? window.setInterval(() => { void refreshOwnerInbox(); }, 30000) : null;
       }
       const isPastSlot = (date, time) => { const now = Object.fromEntries(HCMC_CLOCK.formatToParts(new Date()).map(part => [part.type, part.value])); const today = `${now.year}-${now.month}-${now.day}`; const currentMinute = Number(now.hour) * 60 + Number(now.minute); return date < today || date === today && timeMinutes(time) <= currentMinute; };
       const formatTime = value => { const [h,m] = value.split(':').map(Number); const d = new Date(2000, 0, 1, h, m); return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: m ? '2-digit' : undefined }); };
@@ -567,7 +603,7 @@
             const styleHeight = Math.max(31, height);
             const info = eventText(item);
             const available = item.kind === 'availability';
-            const clickable = visitorMode && available && !isPastSlot(item.date, item.start);
+            const clickable = visitorMode && !ownerView && available && !isPastSlot(item.date, item.start);
             let extra = '';
             if (!visitorMode && item.kind === 'event' && item.visibility === 'private') extra = 'private';
             else if (item.itemType === 'public') extra = 'public';
@@ -625,7 +661,7 @@
       }
       function setPage(page) {
         const isRequests = page === 'requests';
-        if (isRequests && !ownerAuthenticated) { void signInOwner(); return; }
+        if (isRequests && !ownerView) { void enterOwnerView(); return; }
         $('#calendar-page').style.display = isRequests ? 'none' : '';
         $('#requests-page').style.display = isRequests ? 'block' : 'none';
         $('#nav-calendar').classList.toggle('active', !isRequests);
@@ -633,32 +669,32 @@
         if (isRequests) renderRequests();
       }
       function setVisitorMode(value, promptIfLocked = true) {
-        if (!value && !ownerAuthenticated) { if (promptIfLocked) void signInOwner(); return false; }
+        if (!value && !ownerView) { if (promptIfLocked) void enterOwnerView(); return false; }
         visitorMode = value;
         $('#owner-mode').classList.toggle('active', !value);
         $('#visitor-mode').classList.toggle('active', value);
         $('#owner-mode').setAttribute('aria-selected', String(!value));
         $('#visitor-mode').setAttribute('aria-selected', String(value));
-        const publicVisitor = value && !ownerAuthenticated;
-        $('#visitor-banner').style.display = value && ownerAuthenticated ? 'flex' : 'none';
-        $('#modebar').style.display = ownerAuthenticated ? 'flex' : 'none';
-        $('#header-nav').style.display = ownerAuthenticated ? 'flex' : 'none';
-        $('#mode-note').innerHTML = value ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>Click an available time to request it' : `${icon('lock')}Only you can see private slot names`;
-        $('#add-slot').style.display = value ? 'none' : 'inline-flex';
-        $('#preview-button').style.display = publicVisitor ? 'none' : 'inline-flex';
-        $('.heading-actions').style.display = publicVisitor ? 'none' : 'flex';
-        $('.below-grid').style.display = publicVisitor ? 'none' : 'grid';
-        $('#nav-requests').style.display = ownerAuthenticated ? 'flex' : 'none';
-        $('#nav-calendar-label').textContent = ownerAuthenticated ? 'My timetable' : 'Booking page';
-        $('#page-title').textContent = publicVisitor ? 'Book a time' : 'My timetable';
-        $('#page-eyebrow').textContent = publicVisitor ? 'Book a meeting' : 'Your week at a glance';
-        $('#page-subtitle').textContent = publicVisitor ? 'Choose an open time and send a request. The owner will confirm before it is booked.' : 'Plan your time, set what others can see, and make room for good conversations.';
+        const publicVisitor = !ownerView;
+        $('#visitor-banner').style.display = value && ownerView ? 'flex' : 'none';
+        $('#modebar').style.display = ownerView ? 'flex' : 'none';
+        $('#header-nav').style.display = ownerView ? 'flex' : 'none';
+        $('#mode-note').innerHTML = value ? (ownerView ? 'This preview shows the public view' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>Click an available time to request it') : `${icon('lock')}Only you can see private slot names`;
+        $('#add-slot').style.display = ownerView && !value ? 'inline-flex' : 'none';
+        $('#preview-button').style.display = ownerView ? 'inline-flex' : 'none';
+        $('.heading-actions').style.display = ownerView ? 'flex' : 'none';
+        $('.below-grid').style.display = ownerView && !value ? 'grid' : 'none';
+        $('#nav-requests').style.display = ownerView ? 'flex' : 'none';
+        $('#nav-calendar-label').textContent = ownerView ? 'My timetable' : 'Booking page';
+        $('#page-title').textContent = publicVisitor ? 'Book a time' : value ? 'Visitor preview' : 'My timetable';
+        $('#page-eyebrow').textContent = publicVisitor ? 'Book a meeting' : value ? 'Public view' : 'Your week at a glance';
+        $('#page-subtitle').textContent = publicVisitor ? 'Choose an open time and send a request. No account is needed; the owner will confirm before it is booked.' : value ? 'This is the public schedule guests see. Private time only appears as unavailable.' : 'Plan your time, set what others can see, and make room for good conversations.';
         $('#preview-button').innerHTML = value ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m19 12-7 7-7-7m7 7V5"/></svg>Back to my view' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page';
         renderCalendar();
         return true;
       }
       function openSlotModal(slot = null, date = null) {
-        if (visitorMode || !ownerAuthenticated) { void signInOwner(); return; }
+        if (visitorMode || !ownerView) return;
         editingSlotId = slot?.id || null;
         const form = $('#slot-form'); form.reset();
         $('#slot-modal-title').textContent = slot ? 'Edit time slot' : 'Add time slot';
@@ -687,7 +723,7 @@
         $('#booking-form').reset();
         $('#booking-slot-id').value = slot.id;
         $('#booking-error').classList.remove('show');
-        $('#booking-slot-copy').textContent = `${formatDate(slot.date)} · ${formatTime(slot.start)} – ${formatTime(slot.end)}. This time is only added after it's accepted.`;
+        $('#booking-slot-copy').textContent = `${formatDate(slot.date)} · ${formatTime(slot.start)} – ${formatTime(slot.end)}. No account needed; share your name and email so the owner can respond. The time is booked only after acceptance.`;
         $('#booking-modal-backdrop').classList.add('open');
         setTimeout(() => $('#booker-name').focus(), 40);
       }
@@ -700,27 +736,41 @@
         const run = ++applyingSession;
         if (!session) {
           ownerAuthenticated = false;
+          ownerView = false;
+          syncInboxRefresh();
           ownerIdentity = '';
           state = cleanState({});
           persistedSlotIds = new Set();
           updateAuthButton();
           setVisitorMode(true, false);
           setPage('calendar');
+          ownerViewIntent = false;
+          sessionStorage.removeItem('timetable-owner-view-after-signin');
           await loadPublicSchedule();
           return;
         }
+        const publicScheduleLoad = loadPublicSchedule();
         const { data: isOwner, error } = await supabase.rpc('is_timetable_owner');
         if (run !== applyingSession) return;
         if (error) {
           console.error('Owner check failed', error);
           ownerAuthenticated = false;
-          state = cleanState({});
+          ownerView = false;
+          syncInboxRefresh();
           updateAuthButton();
+          await publicScheduleLoad;
           setVisitorMode(true, false);
-          setConnectionNotice('Booking service needs setup', 'The owner access check failed. Apply the database schema and assign your Supabase Auth user as the timetable owner.');
+          setPage('calendar');
+          ownerViewIntent = false;
+          sessionStorage.removeItem('timetable-owner-view-after-signin');
           return;
         }
         if (isOwner !== true) {
+          ownerAuthenticated = false;
+          ownerView = false;
+          syncInboxRefresh();
+          ownerViewIntent = false;
+          sessionStorage.removeItem('timetable-owner-view-after-signin');
           await supabase.auth.signOut();
           toast('This GitHub account does not have owner access yet.');
           return;
@@ -729,10 +779,23 @@
         const githubUsername = session.user.user_metadata?.user_name || session.user.user_metadata?.preferred_username;
         ownerIdentity = githubUsername ? `@${githubUsername}` : session.user.email || 'GitHub account';
         updateAuthButton();
-        const loaded = await loadOwnerData();
+        await publicScheduleLoad;
         if (run !== applyingSession) return;
         setPage('calendar');
-        setVisitorMode(loaded ? false : true, false);
+        if (ownerViewIntent) {
+          ownerViewIntent = false;
+          sessionStorage.removeItem('timetable-owner-view-after-signin');
+          const loaded = await loadOwnerData();
+          if (run !== applyingSession) return;
+          ownerView = loaded;
+          updateAuthButton();
+          syncInboxRefresh();
+          setVisitorMode(!loaded, false);
+          if (!loaded) await loadPublicSchedule();
+        } else {
+          ownerView = false;
+          setVisitorMode(true, false);
+        }
       }
       async function initializeAuth() {
         updateAuthButton();
@@ -760,10 +823,11 @@
       $('#owner-mode').addEventListener('click', () => setVisitorMode(false));
       $('#visitor-mode').addEventListener('click', () => setVisitorMode(true));
       $('#auth-button').addEventListener('click', async () => {
-        if (ownerAuthenticated) {
+        if (ownerView) {
           await supabase.auth.signOut();
           toast('Signed out');
-        } else void signInOwner();
+        } else if (ownerAuthenticated) await enterOwnerView();
+        else void signInOwner();
       });
       $('#nav-calendar').addEventListener('click', () => setPage('calendar'));
       $('#nav-requests').addEventListener('click', () => setPage('requests'));

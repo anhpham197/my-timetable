@@ -1,6 +1,6 @@
 # Timetable
 
-A public timetable and booking page designed for GitHub Pages. Visitors get the public view by default. The owner signs in with GitHub to see private slot names, edit the calendar, and accept or decline booking requests.
+A public timetable and booking page designed for GitHub Pages. Every visit opens the sanitized public schedule, even when the owner has a saved sign-in session. Choose **Owner sign in** to open the private timetable and manage booking requests.
 
 ## Connect the owner sign-in and shared data
 
@@ -20,14 +20,14 @@ The page uses Supabase Auth and Postgres with Row Level Security. GitHub Pages s
    on conflict (singleton) do update set owner_id = excluded.owner_id;
    ```
 
-8. Choose **Owner sign in** again. Your authorized GitHub account now opens the owner timetable; visitors can use the public booking page without an account.
+8. Choose **Owner sign in** again. That sign-in opens your owner timetable; future visits still start on the public schedule until you choose **Owner sign in**. Visitors can request an open time without an account by providing their name and email.
 
 For local use, serve this folder over HTTP (for example, `python3 -m http.server 8000`) and open `http://localhost:8000`.
 
 ## Privacy and access
 
-- Signed-out visitors can read the public schedule through a database function that changes private names to “Unavailable”.
-- Visitors can submit requests through a database function; they cannot read the request inbox.
+- Anyone can read the public schedule through a database function that changes private names to “Unavailable”.
+- Visitors can submit booking requests without signing in; requests stay pending in the owner's inbox until accepted or declined. The owner inbox refreshes while the owner view is open.
 - Only the configured Supabase Auth user ID, associated with your GitHub sign-in, can read private event names, edit slots, or manage requests. The database enforces this with Row Level Security.
 - The Supabase publishable key is visible in the page by design. The schema does not grant public access to raw timetable or booking tables.
 - Keep the `private` schema out of Supabase's exposed API schemas. The policies use it only for an owner check. See [Supabase Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
