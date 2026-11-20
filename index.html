@@ -266,7 +266,7 @@
           <button class="nav-item" id="nav-requests" data-page="requests" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 18.5z"/><path d="M8.5 8h7m-7 4h7m-7 4h4"/></svg>Booking requests<span class="nav-count" id="pending-count" hidden>0</span></button>
         </nav>
         <div class="topbar-right">
-          <div class="timezone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Ho Chi Minh City · GMT+7</span></div>
+          <div class="timezone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><time id="header-time" aria-label="Current time in Ho Chi Minh City"></time></div>
           <span class="auth-identity" id="auth-identity" hidden></span>
           <button class="button auth-button" id="auth-button">Owner sign in</button>
         </div>
@@ -356,6 +356,7 @@
       const PX_PER_MINUTE = 32 / 30;
       const START_MINUTE = 8 * 60;
       const END_MINUTE = 20 * 60;
+      const HCMC_TIME = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Ho_Chi_Minh', hour: 'numeric', minute: '2-digit' });
       const HCMC_CLOCK = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -381,6 +382,13 @@
       let activeSessionKey = 'not-loaded';
 
       const toast = message => { const el = $('#snackbar'); el.textContent = message; el.classList.add('show'); clearTimeout(snackbarTimer); snackbarTimer = setTimeout(() => el.classList.remove('show'), 2800); };
+      function updateHeaderClock() {
+        const now = new Date();
+        const clock = $('#header-time');
+        clock.textContent = HCMC_TIME.format(now);
+        clock.dateTime = now.toISOString();
+        setTimeout(updateHeaderClock, 60000 - now.getSeconds() * 1000 - now.getMilliseconds() + 20);
+      }
       const timeMinutes = value => { const [h,m] = value.split(':').map(Number); return h * 60 + m; };
       const dbTime = value => String(value || '').slice(0, 5);
       const slotFromRow = row => ({ id: row.id, kind: row.kind, title: row.title, date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility });
@@ -827,6 +835,7 @@
         }
       });
 
+      updateHeaderClock();
       renderCalendar();
       setVisitorMode(true, false);
       setPage('calendar');
