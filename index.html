@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f8fb" />
+  <title>Timetable — Your time, your way</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1d2738;
+      --muted: #7a8598;
+      --line: #e8ebf1;
+      --paper: #ffffff;
+      --canvas: #f7f8fb;
+      --navy: #3e1b2c;
+      --blue: #8d2947;
+      --blue-soft: #f8edf1;
+      --green: #20836a;
+      --green-soft: #e8f6f1;
+      --amber: #a86c13;
+      --amber-soft: #fff4dd;
+      --purple: #7e4658;
+      --purple-soft: #f5edf0;
+      --shadow: 0 14px 40px rgba(33, 48, 78, .12);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--canvas); min-width: 320px; }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .app-shell { min-height: 100vh; }
+    .main { width: 100%; max-width: 1600px; min-width: 0; margin: 0 auto; padding: 0 38px 50px; }
+    .topbar { min-height: 86px; display: flex; align-items: center; gap: 24px; border-bottom: 1px solid var(--line); margin-bottom: 29px; }
+    .header-brand { display: inline-flex; align-items: center; gap: 12px; flex: none; color: #351b21; text-decoration: none; font-family: Manrope, sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -.8px; white-space: nowrap; }
+    .brand-mark { display: flex; width: 33px; height: 34px; position: relative; color: #a41034; font-size: 28px; letter-spacing: -6px; align-items: center; font-weight: 800; transform: translateY(-1px); }
+    .brand-mark span { color: #451e27; }
+    .brand-mark i { height: 5px; width: 5px; position: absolute; right: 0; top: 4px; background: #a41034; }
+    .brand-name { font: inherit; color: #351b21; }
+    .brand-dot { color: #a41034; }
+    .header-nav { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+    .nav-item { border: 0; border-radius: 8px; background: transparent; color: #737d8f; padding: 9px 11px; text-align: left; display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 650; transition: .15s ease; white-space: nowrap; }
+    .nav-item:hover { background: #f7f1f3; color: #6e3047; }
+    .nav-item.active { background: #f8edf1; color: #79334a; box-shadow: none; }
+    .nav-item svg { width: 15px; height: 15px; opacity: .9; flex: none; }
+    .nav-count { margin-left: 1px; color: #8d2947; background: #f2dfe6; border-radius: 20px; min-width: 19px; text-align: center; padding: 2px 5px; font-size: 9px; font-weight: 750; }
+    .topbar-right { display: flex; align-items: center; gap: 13px; margin-left: 8px; }
+    .auth-identity { color: #7e4658; font-size: 10px; font-weight: 600; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .auth-button { height: 34px; }
+    .timezone { display: flex; align-items: center; gap: 6px; color: #7d8798; font-size: 11px; }
+    .timezone svg { width: 14px; height: 14px; }
+    .icon-button { position: relative; display: grid; place-items: center; border: 1px solid var(--line); background: white; color: #68748a; border-radius: 9px; width: 35px; height: 35px; }
+    .icon-button svg { width: 16px; height: 16px; }
+    .icon-dot { position: absolute; width: 6px; height: 6px; border: 1px solid white; background: #f0a943; border-radius: 50%; right: 7px; top: 6px; }
+    .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+    .eyebrow { color: #8b96a9; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: .14em; margin: 0 0 9px; }
+    h1 { font-size: 27px; line-height: 1.15; letter-spacing: -.04em; margin: 0; font-weight: 700; color: #202b3e; }
+    .subtitle { font-size: 12px; color: #7f899a; margin: 8px 0 0; }
+    .heading-actions { display: flex; align-items: center; gap: 9px; }
+    .button { border: 1px solid #e0e5ed; background: white; color: #526078; height: 38px; padding: 0 13px; border-radius: 8px; font-size: 11px; font-weight: 650; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: .15s ease; white-space: nowrap; }
+    .button:hover { background: #f8f9fc; border-color: #cfd6e2; }
+    .button svg { width: 15px; height: 15px; }
+    .button.primary { border-color: var(--blue); background: var(--blue); color: white; box-shadow: 0 3px 9px rgba(68,104,232,.18); }
+    .button.primary:hover { background: #78223c; }
+    .button.ghost { background: transparent; }
+    .button.danger { color: #b85050; border-color: #f0dede; }
+    .modebar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 17px; gap: 12px; }
+    .mode-switch { padding: 3px; display: inline-flex; gap: 2px; border: 1px solid #e3e7ef; border-radius: 9px; background: #eef0f5; }
+    .mode-switch button { border: 0; border-radius: 6px; color: #7c8799; background: transparent; padding: 7px 11px; font-size: 10px; font-weight: 650; display: flex; align-items: center; gap: 7px; }
+    .mode-switch button svg { width: 13px; height: 13px; }
+    .mode-switch button.active { color: #67374a; background: white; box-shadow: 0 1px 3px rgba(29,39,56,.12); }
+    .mode-note { display: flex; align-items: center; gap: 6px; color: #8791a2; font-size: 10px; }
+    .mode-note svg { width: 13px; height: 13px; color: #b66580; }
+    .calendar-card { border: 1px solid #e6e9ef; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 4px 14px rgba(34,46,70,.025); }
+    .calendar-toolbar { padding: 13px 16px; min-height: 57px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .week-nav { display: flex; align-items: center; gap: 8px; }
+    .week-title { min-width: 164px; font-size: 12px; font-weight: 650; color: #3d4960; }
+    .arrow-button { width: 27px; height: 27px; background: white; border: 1px solid var(--line); color: #7b8798; display: grid; place-items: center; border-radius: 7px; }
+    .arrow-button:hover { color: var(--blue); border-color: #e7c1cb; }
+    .arrow-button svg { width: 13px; height: 13px; }
+    .toolbar-right { display: flex; align-items: center; gap: 10px; }
+    .today-button { border: 0; background: transparent; color: #64728c; font-size: 10px; font-weight: 650; padding: 6px; }
+    .today-button:hover { color: var(--blue); }
+    .view-picker { color: #657188; border: 1px solid var(--line); padding: 6px 9px; border-radius: 7px; font-size: 10px; background: white; }
+    .calendar-scroll { overflow-x: auto; }
+    .calendar-min-width { min-width: 760px; }
+    .day-head { display: grid; grid-template-columns: 65px repeat(7, minmax(0,1fr)); border-bottom: 1px solid var(--line); }
+    .day-head-spacer { border-right: 1px solid var(--line); }
+    .day-head-cell { text-align: center; padding: 11px 4px 10px; border-right: 1px solid var(--line); color: #8791a3; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+    .day-head-cell:last-child { border-right: 0; }
+    .day-head-cell .date-number { display: inline-grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; color: #4d5a72; margin-top: 5px; font-size: 11px; letter-spacing: 0; }
+    .day-head-cell.today { color: var(--blue); }
+    .day-head-cell.today .date-number { background: var(--blue); color: white; }
+    .calendar-body { display: grid; grid-template-columns: 65px repeat(7, minmax(0,1fr)); height: 768px; }
+    .time-rail { position: relative; border-right: 1px solid var(--line); background: #fdfdfe; }
+    .hour-label { position: absolute; right: 8px; transform: translateY(-50%); font-size: 9px; color: #9ba4b3; white-space: nowrap; }
+    .hour-label:first-child { transform: none; }
+    .day-column { position: relative; border-right: 1px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, #f0f2f6 31px, #f0f2f6 32px, transparent 32px, transparent 63px, #e7eaf0 63px, #e7eaf0 64px); }
+    .day-column:last-child { border-right: 0; }
+    .day-column.today-column { background-color: #fcfcff; }
+    .calendar-event { position: absolute; left: 5px; right: 5px; min-height: 31px; overflow: hidden; border-radius: 6px; border-left: 3px solid; padding: 5px 6px 4px; cursor: pointer; z-index: 1; transition: filter .15s, transform .15s; }
+    .calendar-event:hover { filter: saturate(1.15); transform: translateY(-1px); z-index: 3; }
+    .calendar-event strong { display: block; font-size: 9px; line-height: 1.25; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .calendar-event span { display: block; margin-top: 3px; font-size: 8px; opacity: .82; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .calendar-event.public { color: #79334a; background: #f8edf1; border-color: #b95775; }
+    .calendar-event.private { color: #606b7d; background: #f0f2f5; border-color: #9ba5b4; }
+    .calendar-event.availability { color: #23785f; background: #e7f5f0; border-color: #64b99b; }
+    .calendar-event.booking { color: #6551a4; background: #f0edff; border-color: #9581df; }
+    .calendar-event.pending { color: #956318; background: #fff3d9; border-color: #e3af4b; border-style: dashed; }
+    .calendar-event.public-view { cursor: pointer; }
+    .calendar-event.public-view:hover { box-shadow: 0 2px 8px rgba(32,131,106,.15); }
+    .now-line { height: 2px; background: #eb6c6c; position: absolute; z-index: 2; left: 0; right: 0; pointer-events: none; }
+    .now-line::before { content: ""; position: absolute; width: 6px; height: 6px; left: -3px; top: -2px; border-radius: 50%; background: #eb6c6c; }
+    .calendar-footer { padding: 11px 16px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; color: #919bab; font-size: 9px; }
+    .legend { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-swatch { width: 8px; height: 8px; border-radius: 2px; }
+    .legend-swatch.public { background: #b96d86; }
+    .legend-swatch.private { background: #a5adba; }
+    .legend-swatch.available { background: #6bb99c; }
+    .legend-swatch.booking { background: #9a89d8; }
+    .below-grid { display: grid; grid-template-columns: minmax(0,1fr) 270px; gap: 16px; margin-top: 16px; }
+    .info-card { background: white; border: 1px solid var(--line); border-radius: 11px; padding: 16px; }
+    .info-card h2 { font-size: 12px; margin: 0; color: #3c4960; }
+    .info-card p { color: #8791a1; line-height: 1.55; font-size: 10px; margin: 7px 0 0; }
+    .privacy-row { display: flex; align-items: flex-start; gap: 10px; }
+    .privacy-icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: #9c4561; background: #f8edf1; flex: none; }
+    .privacy-icon svg { width: 14px; height: 14px; }
+    .privacy-row h2 { margin-top: 1px; }
+    .privacy-row p { margin-top: 5px; }
+    .week-stat { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; margin-top: 11px; border-top: 1px solid #f0f1f5; }
+    .week-stat span { font-size: 10px; color: #8a94a4; }
+    .week-stat strong { font-size: 11px; color: #3d4960; }
+    .empty-banner { margin: 12px 0 0; padding: 11px 13px; border: 1px dashed #dce2ed; color: #748096; border-radius: 8px; font-size: 10px; line-height: 1.5; background: #fbfcfe; }
+    .request-page { display: none; }
+    .request-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 4px 0 17px; padding: 18px 20px; border: 1px solid #f1e4c8; background: #fffaf0; border-radius: 11px; }
+    .request-summary h2 { font-size: 13px; margin: 0; color: #574827; }
+    .request-summary p { margin: 5px 0 0; font-size: 10px; color: #8c7c5a; }
+    .request-count { width: 37px; height: 37px; border-radius: 50%; background: #fff0cf; color: #a87420; display: grid; place-items: center; font-weight: 750; font-size: 13px; flex: none; }
+    .section-heading { margin: 22px 0 10px; display: flex; justify-content: space-between; align-items: center; }
+    .section-heading h2 { margin: 0; color: #46536b; font-size: 12px; }
+    .section-heading span { color: #929baa; font-size: 10px; }
+    .request-list { display: grid; gap: 10px; }
+    .request-card { background: white; border: 1px solid var(--line); border-radius: 11px; padding: 16px; display: grid; grid-template-columns: 38px minmax(0,1fr) auto; gap: 13px; align-items: start; }
+    .request-card .avatar { width: 38px; height: 38px; font-size: 12px; background: #f1e6eb; color: #784257; }
+    .request-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .request-meta strong { font-size: 12px; color: #37445d; }
+    .status-pill { color: #9c6c18; background: #fff2d7; padding: 3px 7px; border-radius: 20px; font-size: 8px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .request-time { margin-top: 8px; color: #57647b; font-size: 10px; font-weight: 600; }
+    .request-note { margin: 7px 0 0; color: #8590a0; font-size: 10px; line-height: 1.5; }
+    .request-actions { display: flex; gap: 7px; align-self: center; }
+    .request-actions .button { height: 31px; padding: 0 10px; font-size: 9px; }
+    .request-actions .button.primary { background: #28846b; border-color: #28846b; box-shadow: none; }
+    .request-actions .button.primary:hover { background: #1d725a; }
+    .empty-state { text-align: center; background: white; border: 1px dashed #dce2ed; border-radius: 12px; padding: 52px 20px; color: #8490a2; }
+    .empty-state-icon { margin: 0 auto 13px; width: 42px; height: 42px; border-radius: 13px; color: #8290bd; background: #f0f2fb; display: grid; place-items: center; }
+    .empty-state-icon svg { width: 20px; height: 20px; }
+    .empty-state h2 { color: #4d5a70; font-size: 13px; margin: 0; }
+    .empty-state p { max-width: 350px; margin: 7px auto 0; line-height: 1.6; font-size: 10px; }
+    .visitor-banner { display: none; align-items: flex-start; gap: 11px; padding: 13px 15px; margin: -5px 0 16px; border: 1px solid #ecd5dd; border-radius: 9px; background: #fbf5f7; color: #824157; }
+    .visitor-banner svg { width: 16px; height: 16px; margin-top: 1px; flex: none; }
+    .visitor-banner strong { display: block; font-size: 10px; }
+    .visitor-banner span { display: block; margin-top: 4px; font-size: 9px; color: #98677a; line-height: 1.5; }
+    .connection-banner { display: none; align-items: flex-start; gap: 10px; padding: 11px 13px; margin: -5px 0 15px; border: 1px solid #e7d5dc; border-radius: 8px; background: #fff9fb; color: #784257; }
+    .connection-banner svg { width: 15px; height: 15px; flex: none; margin-top: 1px; }
+    .connection-banner strong { display: block; font-size: 10px; }
+    .connection-banner span { display: block; margin-top: 4px; color: #987485; font-size: 9px; line-height: 1.45; }
+    .snackbar { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; padding: 10px 15px; background: #26334c; color: white; border-radius: 8px; font-size: 11px; box-shadow: var(--shadow); transition: .2s ease; z-index: 30; }
+    .snackbar.show { opacity: 1; transform: translate(-50%, 0); }
+    .modal-backdrop { display: none; position: fixed; inset: 0; z-index: 20; background: rgba(24,34,54,.38); padding: 20px; align-items: center; justify-content: center; }
+    .modal-backdrop.open { display: flex; }
+    .modal { width: min(440px, 100%); max-height: min(90vh, 760px); overflow: auto; background: white; border-radius: 13px; box-shadow: var(--shadow); padding: 22px; animation: rise .18s ease; }
+    @keyframes rise { from { opacity: .6; transform: translateY(7px) scale(.99); } to { opacity: 1; transform: none; } }
+    .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+    .modal-head h2 { margin: 0; font-size: 17px; letter-spacing: -.02em; color: #28354b; }
+    .modal-head p { margin: 6px 0 0; color: #8993a3; font-size: 10px; line-height: 1.5; }
+    .close-button { border: 0; background: #f4f5f8; color: #778297; border-radius: 7px; display: grid; place-items: center; width: 29px; height: 29px; flex: none; }
+    .close-button svg { width: 14px; height: 14px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px 11px; }
+    .field { display: grid; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { color: #667288; font-size: 10px; font-weight: 650; }
+    .field input, .field textarea, .field select { width: 100%; min-height: 36px; border: 1px solid #e0e5ed; border-radius: 7px; outline: 0; padding: 8px 10px; color: #3f4b60; background: white; font-size: 11px; }
+    .field textarea { min-height: 74px; resize: vertical; line-height: 1.5; }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: #d29aab; box-shadow: 0 0 0 3px rgba(141,41,71,.1); }
+    .type-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .type-option { position: relative; }
+    .type-option input { position: absolute; opacity: 0; pointer-events: none; }
+    .type-option label { display: block; padding: 11px; border: 1px solid #e4e7ee; border-radius: 8px; cursor: pointer; }
+    .type-option strong { display: flex; align-items: center; gap: 6px; color: #53617a; font-size: 10px; }
+    .type-option strong svg { width: 13px; height: 13px; }
+    .type-option span { display: block; color: #9099a8; font-size: 8px; margin-top: 5px; line-height: 1.4; font-weight: 450; }
+    .type-option input:checked + label { border-color: #d29aab; background: #fcf6f8; box-shadow: 0 0 0 2px rgba(141,41,71,.08); }
+    .visibility-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .visibility-option { position: relative; }
+    .visibility-option input { position: absolute; opacity: 0; pointer-events: none; }
+    .visibility-option label { border: 1px solid #e4e7ee; border-radius: 8px; display: flex; align-items: flex-start; gap: 8px; padding: 10px; cursor: pointer; }
+    .visibility-option label svg { width: 14px; height: 14px; color: #8190aa; margin-top: 1px; flex: none; }
+    .visibility-option strong { display: block; color: #56637a; font-size: 9px; }
+    .visibility-option span { color: #929baa; display: block; margin-top: 4px; font-weight: 450; font-size: 8px; line-height: 1.35; }
+    .visibility-option input:checked + label { border-color: #d29aab; background: #fcf6f8; }
+    .privacy-help { color: #8490a1; font-size: 9px; line-height: 1.45; margin: 9px 0 0; }
+    .modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 19px; gap: 8px; }
+    .modal-actions .right-actions { display: flex; gap: 8px; margin-left: auto; }
+    .modal-actions .button { height: 35px; font-size: 10px; }
+    .modal-error { display: none; color: #ad4747; font-size: 9px; margin: 10px 0 0; }
+    .modal-error.show { display: block; }
+    @media (max-width: 1000px) {
+      .main { padding: 0 22px 35px; }
+      .below-grid { grid-template-columns: 1fr; }
+      .topbar { gap: 12px; }
+      .topbar-right { gap: 8px; }
+      .timezone { display: none; }
+      .auth-identity { max-width: 145px; }
+    }
+    @media (max-width: 760px) {
+      .main { padding: 0 14px 30px; }
+      .topbar { min-height: 0; display: grid; grid-template-columns: 1fr auto; padding: 12px 0; margin-bottom: 22px; gap: 10px; }
+      .header-brand { grid-column: 1; grid-row: 1; }
+      .header-nav { grid-column: 1 / -1; grid-row: 2; margin: 0; border-top: 1px solid var(--line); padding-top: 8px; }
+      .header-nav .nav-item { padding: 8px 9px; font-size: 10px; }
+      .header-nav .nav-item svg { width: 14px; height: 14px; }
+      .nav-count { min-width: 17px; padding: 2px 4px; font-size: 8px; }
+      .topbar-right { grid-column: 2; grid-row: 1; margin: 0; gap: 7px; }
+      .timezone { display: none; }
+      .auth-identity { display: none !important; }
+      .page-heading { align-items: flex-start; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+      h1 { font-size: 23px; }
+      .heading-actions { width: 100%; }
+      .heading-actions .button { flex: 1; }
+      .modebar { align-items: flex-start; flex-direction: column; }
+      .mode-note { padding-left: 3px; }
+      .calendar-toolbar { padding: 11px 10px; }
+      .week-title { min-width: 135px; font-size: 10px; }
+      .toolbar-right { gap: 4px; }
+      .view-picker { display: none; }
+      .calendar-card { border-radius: 9px; }
+      .request-card { grid-template-columns: 34px minmax(0,1fr); }
+      .request-actions { grid-column: 2; }
+      .request-summary { padding: 14px; }
+    }
+    @media (max-width: 420px) {
+      .header-nav .nav-item { padding: 7px; }
+      .heading-actions .button { padding: 0 8px; font-size: 10px; }
+      .mode-switch button { padding: 7px 8px; }
+      .calendar-min-width { min-width: 690px; }
+      .day-head, .calendar-body { grid-template-columns: 53px repeat(7, minmax(0,1fr)); }
+      .calendar-event { left: 3px; right: 3px; padding: 4px; }
+      .calendar-event strong { font-size: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <main class="main">
+      <div class="topbar">
+        <a class="header-brand" href="https://anhpham197.github.io/portfolio/" aria-label="Anh Pham portfolio">
+          <span class="brand-mark" aria-hidden="true">a<span>p</span><i></i></span>
+          <span class="brand-name">anh pham<span class="brand-dot">.</span></span>
+        </a>
+        <nav class="header-nav" id="header-nav" aria-label="Main navigation" style="display:none">
+          <button class="nav-item active" id="nav-calendar" data-page="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4M16.5 3v4M4 9.5h16M8 13h3m2.5 0H16M8 16.5h3"/></svg><span id="nav-calendar-label">Booking page</span></button>
+          <button class="nav-item" id="nav-requests" data-page="requests" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 18.5z"/><path d="M8.5 8h7m-7 4h7m-7 4h4"/></svg>Booking requests<span class="nav-count" id="pending-count" hidden>0</span></button>
+        </nav>
+        <div class="topbar-right">
+          <div class="timezone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Ho Chi Minh City · GMT+7</span></div>
+          <span class="auth-identity" id="auth-identity" hidden></span>
+          <button class="button auth-button" id="auth-button">Owner sign in</button>
+        </div>
+      </div>
+
+      <section id="calendar-page">
+        <div class="page-heading">
+          <div><p class="eyebrow" id="page-eyebrow">Book a meeting</p><h1 id="page-title">Book a time</h1><p class="subtitle" id="page-subtitle">Choose an open time and send a request. The owner will confirm before it is booked.</p></div>
+          <div class="heading-actions" style="display:none"><button class="button" id="preview-button" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page</button><button class="button primary" id="add-slot" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14"/></svg>Add time slot</button></div>
+        </div>
+
+        <div class="modebar" id="modebar" style="display:none">
+          <div class="mode-switch" role="tablist" aria-label="Calendar view">
+            <button class="active" id="owner-mode" role="tab" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5z"/><path d="M8 3v4m8-4v4M4 9h16"/></svg>My view</button>
+            <button id="visitor-mode" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.3"/><path d="M5 20c.3-3.4 2.7-5.3 7-5.3s6.7 1.9 7 5.3"/></svg>Visitor preview</button>
+          </div>
+          <div class="mode-note" id="mode-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg>Only you can see private slot names</div>
+        </div>
+        <div class="visitor-banner" id="visitor-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg><div><strong>This is what visitors can see</strong><span>Private time appears as “Unavailable”. Available times can be requested; your timetable changes only after you accept.</span></div></div>
+        <div class="connection-banner" id="connection-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg><div><strong id="connection-title">Booking service isn't connected</strong><span id="connection-copy">This preview needs its authentication and database service connected before visitors can share bookings with you.</span></div></div>
+
+        <div class="calendar-card">
+          <div class="calendar-toolbar">
+            <div class="week-nav"><button class="arrow-button" id="prev-week" aria-label="Previous week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button><button class="arrow-button" id="next-week" aria-label="Next week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button><div class="week-title" id="week-title"></div></div>
+            <div class="toolbar-right"><button class="today-button" id="today-button">Today</button><select class="view-picker" aria-label="Calendar range" disabled><option>Week</option></select></div>
+          </div>
+          <div class="calendar-scroll"><div class="calendar-min-width"><div class="day-head" id="day-head"></div><div class="calendar-body" id="calendar-body"></div></div></div>
+          <div class="calendar-footer"><div class="legend" id="legend"><span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span></div><span>Times shown in GMT+7</span></div>
+        </div>
+        <div class="below-grid">
+          <div class="info-card"><div class="privacy-row"><div class="privacy-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 8 3v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></svg></div><div><h2>Your privacy stays in your hands</h2><p>Choose visibility for each personal time slot. Private slots only show others that you're unavailable; the name and details stay yours.</p></div></div></div>
+          <div class="info-card"><h2>This week</h2><div class="week-stat"><span>Time slots</span><strong id="stat-slots">0</strong></div><div class="week-stat"><span>Open for booking</span><strong id="stat-open">0</strong></div></div>
+        </div>
+        <div class="empty-banner" id="empty-banner" hidden>Your timetable is clear. Add a personal event or create an open time for people to request.</div>
+      </section>
+
+      <section class="request-page" id="requests-page">
+        <div class="page-heading"><div><p class="eyebrow">Your inbox</p><h1>Booking requests</h1><p class="subtitle">Review each request before a meeting is added to your timetable.</p></div><button class="button" id="requests-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5m7 7-7-7 7-7"/></svg>Back to timetable</button></div>
+        <div class="request-summary"><div><h2 id="requests-summary-title">You're in control of every booking</h2><p id="requests-summary-copy">Accept a request to add it to your timetable, or decline if the time doesn't work.</p></div><div class="request-count" id="request-count">0</div></div>
+        <div class="section-heading"><h2>Waiting for your response</h2><span id="pending-label">0 requests</span></div>
+        <div class="request-list" id="pending-list"></div>
+        <div class="section-heading"><h2>Confirmed bookings</h2><span id="confirmed-label">0 bookings</span></div>
+        <div class="request-list" id="confirmed-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="slot-modal-backdrop" role="presentation">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="slot-modal-title">
+      <div class="modal-head"><div><h2 id="slot-modal-title">Add time slot</h2><p>Choose what this time means and who can see the details.</p></div><button class="close-button" data-close="slot-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
+      <form id="slot-form">
+        <div class="field full" style="margin-bottom:13px"><label>Slot type</label><div class="type-options">
+          <div class="type-option"><input type="radio" name="kind" value="event" id="kind-event" checked><label for="kind-event"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M8 3v4m8-4v4M4 10h16"/></svg>Personal time</strong><span>Add an event or block on your timetable.</span></label></div>
+          <div class="type-option"><input type="radio" name="kind" value="availability" id="kind-availability"><label for="kind-availability"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Open for booking</strong><span>Let someone request this time with you.</span></label></div>
+        </div></div>
+        <div class="form-grid">
+          <div class="field full" id="slot-title-field"><label for="slot-title">Name</label><input id="slot-title" name="title" maxlength="60" placeholder="e.g. Project focus" required /></div>
+          <div class="field"><label for="slot-date">Date</label><input type="date" id="slot-date" name="date" required /></div>
+          <div class="field"><label for="slot-start">Starts</label><input type="time" id="slot-start" name="start" value="09:00" step="1800" required /></div>
+          <div class="field"><label for="slot-end">Ends</label><input type="time" id="slot-end" name="end" value="10:00" step="1800" required /></div>
+          <div class="field full" id="visibility-field"><label>Who can see this slot?</label><div class="visibility-options">
+            <div class="visibility-option"><input type="radio" name="visibility" value="public" id="visibility-public" checked><label for="visibility-public"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18m0-18a14 14 0 0 0 0 18"/></svg><span><strong>Public</strong><span>Others can see the name</span></span></label></div>
+            <div class="visibility-option"><input type="radio" name="visibility" value="private" id="visibility-private"><label for="visibility-private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg><span><strong>Private</strong><span>Others only see unavailable</span></span></label></div>
+          </div><p class="privacy-help">Open booking times are visible to visitors. Personal time blocks prevent overlapping requests.</p></div>
+        </div>
+        <p class="modal-error" id="slot-error"></p>
+        <div class="modal-actions"><button class="button danger" type="button" id="delete-slot" hidden>Delete slot</button><div class="right-actions"><button class="button" type="button" data-close="slot-modal-backdrop">Cancel</button><button class="button primary" type="submit" id="save-slot">Save slot</button></div></div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="booking-modal-backdrop" role="presentation">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
+      <div class="modal-head"><div><h2 id="booking-modal-title">Request this time</h2><p id="booking-slot-copy">Send a request. This time is only added after it's accepted.</p></div><button class="close-button" data-close="booking-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
+      <form id="booking-form"><input type="hidden" name="slotId" id="booking-slot-id" />
+        <div class="form-grid"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required placeholder="Name" /></div><div class="field full"><label for="booker-email">Email</label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" required placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">What would you like to discuss?</label><textarea id="booking-note" name="note" maxlength="400" placeholder="Add a short note (optional)"></textarea></div></div>
+        <p class="modal-error" id="booking-error"></p><div class="modal-actions"><span></span><div class="right-actions"><button class="button" type="button" data-close="booking-modal-backdrop">Cancel</button><button class="button primary" type="submit">Send request</button></div></div>
+      </form>
+    </section>
+  </div>
+  <div class="snackbar" id="snackbar" role="status" aria-live="polite"></div>
+
+  <script src="./supabase-config.js"></script>
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+    (() => {
+      const PX_PER_MINUTE = 32 / 30;
+      const START_MINUTE = 8 * 60;
+      const END_MINUTE = 20 * 60;
+      const HCMC_CLOCK = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+      const pad = n => String(n).padStart(2, '0');
+      const dateKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+      const fromKey = key => { const [y,m,d] = key.split('-').map(Number); return new Date(y, m - 1, d, 12); };
+      const startOfWeek = date => { const result = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12); result.setDate(result.getDate() - ((result.getDay() + 6) % 7)); return result; };
+      const uid = () => globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); });
+      const cleanState = value => ({ slots: Array.isArray(value?.slots) ? value.slots : [], requests: Array.isArray(value?.requests) ? value.requests : [] });
+      const supabaseUrl = window.TIMETABLE_SUPABASE_URL || '';
+      const supabaseKey = window.TIMETABLE_SUPABASE_PUBLISHABLE_KEY || '';
+      const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+      let state = cleanState({});
+      let week = startOfWeek(new Date());
+      let visitorMode = true;
+      let ownerAuthenticated = false;
+      let ownerIdentity = '';
+      let applyingSession = 0;
+      let persistedSlotIds = new Set();
+      let editingSlotId = null;
+      let snackbarTimer;
+      let bookingTargetId = null;
+      let activeSessionKey = 'not-loaded';
+
+      const toast = message => { const el = $('#snackbar'); el.textContent = message; el.classList.add('show'); clearTimeout(snackbarTimer); snackbarTimer = setTimeout(() => el.classList.remove('show'), 2800); };
+      const timeMinutes = value => { const [h,m] = value.split(':').map(Number); return h * 60 + m; };
+      const dbTime = value => String(value || '').slice(0, 5);
+      const slotFromRow = row => ({ id: row.id, kind: row.kind, title: row.title, date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility });
+      const slotToRow = slot => ({ id: slot.id, kind: slot.kind, title: slot.title, slot_date: slot.date, start_time: slot.start, end_time: slot.end, visibility: slot.visibility });
+      const requestFromRow = row => ({ id: row.id, slotId: row.slot_id, availabilityTitle: row.availability_title, name: row.name, email: row.email, note: row.note || '', date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), status: row.status, createdAt: row.created_at });
+      const save = async () => {
+        if (!supabase || !ownerAuthenticated) return false;
+        const slots = state.slots.map(slotToRow);
+        const removedSlots = [...persistedSlotIds].filter(id => !state.slots.some(slot => slot.id === id));
+        try {
+          if (slots.length) { const { error } = await supabase.from('timetable_slots').upsert(slots); if (error) throw error; }
+          const requestUpdates = await Promise.all(state.requests.map(request => supabase.from('booking_requests').update({ status: request.status }).eq('id', request.id)));
+          const requestError = requestUpdates.find(result => result.error)?.error;
+          if (requestError) throw requestError;
+          if (removedSlots.length) { const { error } = await supabase.from('timetable_slots').delete().in('id', removedSlots); if (error) throw error; }
+          persistedSlotIds = new Set(state.slots.map(slot => slot.id));
+          return true;
+        } catch (error) {
+          console.error('Timetable save failed', error);
+          toast('Could not save changes. Check your connection and try again.');
+          await loadOwnerData();
+          return false;
+        }
+      };
+      function setConnectionNotice(title, copy, visible = true) {
+        $('#connection-title').textContent = title;
+        $('#connection-copy').textContent = copy;
+        $('#connection-banner').style.display = visible ? 'flex' : 'none';
+      }
+      function updateAuthButton() {
+        const button = $('#auth-button');
+        const identity = $('#auth-identity');
+        if (ownerAuthenticated) {
+          button.textContent = 'Sign out';
+          button.title = `Sign out ${ownerIdentity ? `(${ownerIdentity})` : ''}`;
+          identity.textContent = ownerIdentity ? `Owner · ${ownerIdentity}` : 'Owner view';
+          identity.hidden = false;
+        } else {
+          button.textContent = 'Owner sign in';
+          button.title = 'Sign in with GitHub to manage your timetable';
+          identity.textContent = '';
+          identity.hidden = true;
+        }
+      }
+      async function signInOwner() {
+        if (!supabase) {
+          toast('Owner sign-in is not connected yet. See the setup instructions in README.');
+          return;
+        }
+        const button = $('#auth-button');
+        button.disabled = true;
+        button.textContent = 'Opening GitHub…';
+        const redirect = new URL(window.location.href);
+        redirect.hash = '';
+        redirect.search = '';
+        try {
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'github',
+            options: { redirectTo: redirect.toString() }
+          });
+          if (!error) return;
+          throw error;
+        } catch (error) {
+          button.disabled = false;
+          updateAuthButton();
+          toast(`Could not start GitHub sign-in: ${error?.message || 'Please try again.'}`);
+        }
+      }
+      async function loadPublicSchedule() {
+        if (!supabase) { state = cleanState({}); renderCalendar(); return; }
+        const { data, error } = await supabase.rpc('get_public_schedule', { p_from: '1900-01-01', p_to: '2100-12-31' });
+        if (error) {
+          console.error('Public timetable load failed', error);
+          state = cleanState({});
+          setConnectionNotice('Booking service needs setup', 'The timetable backend is configured but could not load public availability. Apply the included database schema and check your Supabase settings.');
+        } else {
+          state = cleanState({ slots: (data || []).map(row => ({ id: row.id, kind: row.kind, title: row.title, date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility })), requests: [] });
+          setConnectionNotice('', '', false);
+        }
+        renderCalendar();
+      }
+      async function loadOwnerData() {
+        if (!supabase || !ownerAuthenticated) return false;
+        const [slotResult, requestResult] = await Promise.all([
+          supabase.from('timetable_slots').select('*'),
+          supabase.from('booking_requests').select('*')
+        ]);
+        if (slotResult.error || requestResult.error) {
+          console.error('Owner timetable load failed', slotResult.error || requestResult.error);
+          setConnectionNotice('Could not load your timetable', 'Check the database schema and owner access policy, then sign in again.');
+          return false;
+        }
+        state = cleanState({ slots: (slotResult.data || []).map(slotFromRow), requests: (requestResult.data || []).map(requestFromRow) });
+        persistedSlotIds = new Set(state.slots.map(slot => slot.id));
+        setConnectionNotice('', '', false);
+        renderCalendar(); renderRequests();
+        return true;
+      }
+      const isPastSlot = (date, time) => { const now = Object.fromEntries(HCMC_CLOCK.formatToParts(new Date()).map(part => [part.type, part.value])); const today = `${now.year}-${now.month}-${now.day}`; const currentMinute = Number(now.hour) * 60 + Number(now.minute); return date < today || date === today && timeMinutes(time) <= currentMinute; };
+      const formatTime = value => { const [h,m] = value.split(':').map(Number); const d = new Date(2000, 0, 1, h, m); return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: m ? '2-digit' : undefined }); };
+      const formatDate = (key, options = { weekday: 'long', month: 'long', day: 'numeric' }) => fromKey(key).toLocaleDateString('en-US', options);
+      const slotEnd = slot => timeMinutes(slot.end);
+      const isPending = request => request.status === 'pending';
+      const isConfirmed = request => request.status === 'accepted';
+      const dayMatches = (item, key) => item.date === key;
+      const rangesOverlap = (aStart, aEnd, bStart, bEnd) => timeMinutes(aStart) < timeMinutes(bEnd) && timeMinutes(aEnd) > timeMinutes(bStart);
+      const overlapping = (date, start, end, exceptId = null) => state.slots.some(item => item.id !== exceptId && item.date === date && rangesOverlap(start, end, item.start, item.end)) || state.requests.some(item => item.status !== 'declined' && item.slotId !== exceptId && item.date === date && rangesOverlap(start, end, item.start, item.end));
+      const icon = name => ({
+        lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg>',
+        plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14"/></svg>'
+      }[name] || '');
+
+      function weekDates() { return Array.from({ length: 7 }, (_, i) => { const d = new Date(week); d.setDate(week.getDate() + i); return d; }); }
+      function updateWeekTitle() {
+        const dates = weekDates();
+        const first = dates[0], last = dates[6];
+        const sameMonth = first.getMonth() === last.getMonth() && first.getFullYear() === last.getFullYear();
+        const opts = { month: 'short', day: 'numeric' };
+        const label = sameMonth ? `${first.toLocaleDateString('en-US', opts)} – ${last.toLocaleDateString('en-US', { day: 'numeric' })}` : `${first.toLocaleDateString('en-US', opts)} – ${last.toLocaleDateString('en-US', opts)}`;
+        $('#week-title').textContent = `${label}, ${last.getFullYear()}`;
+      }
+      function requestsForSlot(slotId) { return state.requests.filter(r => r.slotId === slotId && r.status !== 'declined'); }
+      function itemEventsForDay(key) {
+        const own = state.slots.filter(item => dayMatches(item, key) && !(item.kind === 'availability' && state.requests.some(request => request.slotId === item.id && (isPending(request) || isConfirmed(request))))).map(item => ({ ...item, itemType: item.kind === 'availability' ? 'availability' : item.kind === 'booking' ? 'booking' : item.kind === 'pending' ? 'pending' : item.visibility }));
+        const bookings = state.requests.filter(r => r.status === 'accepted' && dayMatches(r, key)).map(r => ({ ...r, id: r.id, kind: 'booking', itemType: 'booking', title: r.name, start: r.start, end: r.end, date: r.date }));
+        const pending = state.requests.filter(r => r.status === 'pending' && dayMatches(r, key)).map(r => ({ ...r, id: r.id, kind: 'pending', itemType: visitorMode ? 'private' : 'pending', title: visitorMode ? 'Unavailable' : `Request · ${r.name}`, start: r.start, end: r.end, date: r.date }));
+        return [...own, ...bookings, ...pending];
+      }
+      function eventText(item) {
+        if (visitorMode) {
+          if (item.kind === 'availability') return isPastSlot(item.date, item.start) ? { title: 'Unavailable', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` } : { title: 'Available to book', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
+          if (item.kind === 'booking') return { title: 'Booked', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
+          if (item.kind === 'pending') return { title: 'Unavailable', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
+          if (item.visibility === 'private') return { title: 'Unavailable', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
+          return { title: item.title, sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
+        }
+        if (item.kind === 'availability') return { title: item.title || 'Open for booking', sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Open` };
+        if (item.kind === 'booking') return { title: `Booking · ${item.name}`, sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Confirmed` };
+        if (item.kind === 'pending') return { title: `Request · ${item.name}`, sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Needs review` };
+        if (item.visibility === 'private') return { title: item.title, sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Private` };
+        return { title: item.title, sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Public` };
+      }
+      function renderCalendar() {
+        updateWeekTitle();
+        const dates = weekDates();
+        const todayKey = dateKey(new Date());
+        $('#day-head').innerHTML = `<div class="day-head-spacer"></div>` + dates.map(date => {
+          const key = dateKey(date), today = key === todayKey;
+          return `<div class="day-head-cell ${today ? 'today' : ''}">${date.toLocaleDateString('en-US', { weekday: 'short' })}<br><span class="date-number">${date.getDate()}</span></div>`;
+        }).join('');
+        let body = '<div class="time-rail">';
+        for (let hour = 8; hour <= 20; hour++) {
+          const top = (hour * 60 - START_MINUTE) * PX_PER_MINUTE;
+          body += `<span class="hour-label" style="top:${top}px">${new Date(2000,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'})}</span>`;
+        }
+        body += '</div>';
+        dates.forEach(date => {
+          const key = dateKey(date), today = key === todayKey;
+          body += `<div class="day-column ${today ? 'today-column' : ''}" data-date="${key}">`;
+          for (const item of itemEventsForDay(key)) {
+            const start = timeMinutes(item.start), end = slotEnd(item);
+            if (end <= START_MINUTE || start >= END_MINUTE) continue;
+            const top = Math.max(0, (start - START_MINUTE) * PX_PER_MINUTE);
+            const height = Math.max(31, Math.min(END_MINUTE, end) - Math.max(START_MINUTE, start)) * PX_PER_MINUTE;
+            const styleHeight = Math.max(31, height);
+            const info = eventText(item);
+            const available = item.kind === 'availability';
+            const clickable = visitorMode && available && !isPastSlot(item.date, item.start);
+            let extra = '';
+            if (!visitorMode && item.kind === 'event' && item.visibility === 'private') extra = 'private';
+            else if (item.itemType === 'public') extra = 'public';
+            else if (item.itemType === 'availability') extra = 'availability';
+            else if (item.kind === 'booking') extra = 'booking';
+            else if (item.kind === 'pending') extra = 'pending';
+            else if (visitorMode && item.visibility === 'private') extra = 'private';
+            const editable = !visitorMode && (item.kind === 'event' || item.kind === 'availability');
+            const dataAttrs = clickable ? `data-book="${item.id}"` : (editable ? `data-edit="${item.id}"` : item.kind === 'pending' && !visitorMode ? 'data-open-requests="true"' : '');
+            body += `<article class="calendar-event ${extra} ${clickable ? 'public-view' : ''}" style="top:${top}px;height:${styleHeight}px" ${dataAttrs} tabindex="${clickable || editable || item.kind === 'pending' && !visitorMode ? '0' : '-1'}" aria-label="${escapeHtml(info.title)}, ${escapeHtml(info.sub)}"><strong>${escapeHtml(info.title)}</strong><span>${escapeHtml(info.sub)}</span></article>`;
+          }
+          const now = new Date();
+          if (key === todayKey && now.getHours() >= 8 && now.getHours() < 20) {
+            const top = (now.getHours() * 60 + now.getMinutes() - START_MINUTE) * PX_PER_MINUTE;
+            body += `<div class="now-line" style="top:${top}px"></div>`;
+          }
+          body += '</div>';
+        });
+        $('#calendar-body').innerHTML = body;
+        const weekSlots = state.slots.filter(slot => dates.some(d => dateKey(d) === slot.date) && !(slot.kind === 'availability' && state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))));
+        $('#stat-slots').textContent = String(weekSlots.length + state.requests.filter(r => r.status === 'accepted' && dates.some(d => dateKey(d) === r.date)).length);
+        $('#stat-open').textContent = String(state.slots.filter(slot => slot.kind === 'availability' && dates.some(d => dateKey(d) === slot.date) && !state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))).length);
+        const hasSlots = dates.some(d => itemEventsForDay(dateKey(d)).length > 0);
+        const hasBookableTime = dates.some(d => itemEventsForDay(dateKey(d)).some(item => item.kind === 'availability' && !isPastSlot(item.date, item.start)));
+        $('#empty-banner').hidden = visitorMode ? hasBookableTime : hasSlots;
+        $('#empty-banner').textContent = visitorMode ? 'There are no times to book this week. Check another week or come back later.' : 'Your timetable is clear. Add a personal event or create an open time for people to request.';
+        $('#legend').innerHTML = visitorMode ? '<span class="legend-item"><i class="legend-swatch available"></i>Available to request</span><span class="legend-item"><i class="legend-swatch private"></i>Unavailable</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>' : '<span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>';
+        updateRequestCounts();
+      }
+      function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+      function updateRequestCounts() {
+        const count = state.requests.filter(isPending).length;
+        const badge = $('#pending-count'); badge.textContent = count; badge.hidden = count === 0;
+        $('#request-count').textContent = count;
+        $('#pending-label').textContent = `${count} ${count === 1 ? 'request' : 'requests'}`;
+        const acceptedCount = state.requests.filter(isConfirmed).length;
+        $('#confirmed-label').textContent = `${acceptedCount} ${acceptedCount === 1 ? 'booking' : 'bookings'}`;
+        $('#requests-summary-title').textContent = count ? `${count} ${count === 1 ? 'request needs' : 'requests need'} your response` : 'You’re in control of every booking';
+        $('#requests-summary-copy').textContent = count ? 'Accept a request to add it to your timetable, or decline if the time doesn’t work.' : 'When someone requests an open time, it will appear here for you to review.';
+      }
+      function initials(name) { return String(name || '?').trim().split(/\s+/).slice(0,2).map(part => part[0]).join('').toUpperCase(); }
+      function requestCard(request, confirmed = false) {
+        const status = confirmed ? '<span class="status-pill" style="color:#36816d;background:#e8f6f1">Confirmed</span>' : '<span class="status-pill">Awaiting response</span>';
+        const actions = confirmed ? `<div class="request-actions"><button class="button danger" data-cancel-booking="${request.id}">Cancel booking</button></div>` : `<div class="request-actions"><button class="button" data-decline="${request.id}">Decline</button><button class="button primary" data-accept="${request.id}">Accept</button></div>`;
+        const note = request.note ? `<p class="request-note">“${escapeHtml(request.note)}”</p>` : '';
+        return `<article class="request-card"><div class="avatar">${escapeHtml(initials(request.name))}</div><div><div class="request-meta"><strong>${escapeHtml(request.name)}</strong>${status}</div><div class="request-time">${escapeHtml(formatDate(request.date))} · ${escapeHtml(formatTime(request.start))} – ${escapeHtml(formatTime(request.end))}</div><p class="request-note">${escapeHtml(request.email)}</p>${note}</div>${actions}</article>`;
+      }
+      function renderRequests() {
+        const pending = state.requests.filter(isPending).sort((a,b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start));
+        const confirmed = state.requests.filter(isConfirmed).sort((a,b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start));
+        $('#pending-list').innerHTML = pending.length ? pending.map(r => requestCard(r)).join('') : `<div class="empty-state"><div class="empty-state-icon">${icon('lock')}</div><h2>All caught up</h2><p>New booking requests will show up here. You choose which ones make it onto your timetable.</p></div>`;
+        $('#confirmed-list').innerHTML = confirmed.length ? confirmed.map(r => requestCard(r, true)).join('') : `<div class="empty-state" style="padding:30px 18px"><div class="empty-state-icon">${icon('plus')}</div><h2>No confirmed bookings yet</h2><p>Accepted requests will appear here and on your timetable.</p></div>`;
+        updateRequestCounts();
+      }
+      function setPage(page) {
+        const isRequests = page === 'requests';
+        if (isRequests && !ownerAuthenticated) { void signInOwner(); return; }
+        $('#calendar-page').style.display = isRequests ? 'none' : '';
+        $('#requests-page').style.display = isRequests ? 'block' : 'none';
+        $('#nav-calendar').classList.toggle('active', !isRequests);
+        $('#nav-requests').classList.toggle('active', isRequests);
+        if (isRequests) renderRequests();
+      }
+      function setVisitorMode(value, promptIfLocked = true) {
+        if (!value && !ownerAuthenticated) { if (promptIfLocked) void signInOwner(); return false; }
+        visitorMode = value;
+        $('#owner-mode').classList.toggle('active', !value);
+        $('#visitor-mode').classList.toggle('active', value);
+        $('#owner-mode').setAttribute('aria-selected', String(!value));
+        $('#visitor-mode').setAttribute('aria-selected', String(value));
+        const publicVisitor = value && !ownerAuthenticated;
+        $('#visitor-banner').style.display = value && ownerAuthenticated ? 'flex' : 'none';
+        $('#modebar').style.display = ownerAuthenticated ? 'flex' : 'none';
+        $('#header-nav').style.display = ownerAuthenticated ? 'flex' : 'none';
+        $('#mode-note').innerHTML = value ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>Click an available time to request it' : `${icon('lock')}Only you can see private slot names`;
+        $('#add-slot').style.display = value ? 'none' : 'inline-flex';
+        $('#preview-button').style.display = publicVisitor ? 'none' : 'inline-flex';
+        $('.heading-actions').style.display = publicVisitor ? 'none' : 'flex';
+        $('.below-grid').style.display = publicVisitor ? 'none' : 'grid';
+        $('#nav-requests').style.display = ownerAuthenticated ? 'flex' : 'none';
+        $('#nav-calendar-label').textContent = ownerAuthenticated ? 'My timetable' : 'Booking page';
+        $('#page-title').textContent = publicVisitor ? 'Book a time' : 'My timetable';
+        $('#page-eyebrow').textContent = publicVisitor ? 'Book a meeting' : 'Your week at a glance';
+        $('#page-subtitle').textContent = publicVisitor ? 'Choose an open time and send a request. The owner will confirm before it is booked.' : 'Plan your time, set what others can see, and make room for good conversations.';
+        $('#preview-button').innerHTML = value ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m19 12-7 7-7-7m7 7V5"/></svg>Back to my view' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page';
+        renderCalendar();
+        return true;
+      }
+      function openSlotModal(slot = null, date = null) {
+        if (visitorMode || !ownerAuthenticated) { void signInOwner(); return; }
+        editingSlotId = slot?.id || null;
+        const form = $('#slot-form'); form.reset();
+        $('#slot-modal-title').textContent = slot ? 'Edit time slot' : 'Add time slot';
+        $('#save-slot').textContent = slot ? 'Save changes' : 'Save slot';
+        $('#delete-slot').hidden = !slot;
+        $('#slot-error').classList.remove('show');
+        $('#slot-date').value = slot?.date || date || dateKey(new Date());
+        $('#slot-start').value = slot?.start || '09:00';
+        $('#slot-end').value = slot?.end || '10:00';
+        $('#slot-title').value = slot?.title || '';
+        $(`input[name="kind"][value="${slot?.kind || 'event'}"]`).checked = true;
+        $(`input[name="visibility"][value="${slot?.visibility || 'public'}"]`).checked = true;
+        updateSlotFormKind();
+        $('#slot-modal-backdrop').classList.add('open');
+        setTimeout(() => (slot ? $('#slot-title') : $('#slot-title')).focus(), 40);
+      }
+      function updateSlotFormKind() {
+        const availability = $('input[name="kind"]:checked', $('#slot-form')).value === 'availability';
+        $('#slot-title-field').hidden = availability;
+        $('#slot-title').required = !availability;
+        $('#visibility-field').hidden = availability;
+      }
+      function openBookingModal(slot) {
+        if (!supabase) { toast('Online booking is not connected yet.'); return; }
+        bookingTargetId = slot.id;
+        $('#booking-form').reset();
+        $('#booking-slot-id').value = slot.id;
+        $('#booking-error').classList.remove('show');
+        $('#booking-slot-copy').textContent = `${formatDate(slot.date)} · ${formatTime(slot.start)} – ${formatTime(slot.end)}. This time is only added after it's accepted.`;
+        $('#booking-modal-backdrop').classList.add('open');
+        setTimeout(() => $('#booker-name').focus(), 40);
+      }
+      function closeModal(id) { $(`#${id}`).classList.remove('open'); }
+      function showError(selector, message) { const el = $(selector); el.textContent = message; el.classList.add('show'); }
+      async function applyAuthSession(session) {
+        const sessionKey = session?.user?.id || null;
+        if (activeSessionKey === sessionKey) return;
+        activeSessionKey = sessionKey;
+        const run = ++applyingSession;
+        if (!session) {
+          ownerAuthenticated = false;
+          ownerIdentity = '';
+          state = cleanState({});
+          persistedSlotIds = new Set();
+          updateAuthButton();
+          setVisitorMode(true, false);
+          setPage('calendar');
+          await loadPublicSchedule();
+          return;
+        }
+        const { data: isOwner, error } = await supabase.rpc('is_timetable_owner');
+        if (run !== applyingSession) return;
+        if (error) {
+          console.error('Owner check failed', error);
+          ownerAuthenticated = false;
+          state = cleanState({});
+          updateAuthButton();
+          setVisitorMode(true, false);
+          setConnectionNotice('Booking service needs setup', 'The owner access check failed. Apply the database schema and assign your Supabase Auth user as the timetable owner.');
+          return;
+        }
+        if (isOwner !== true) {
+          await supabase.auth.signOut();
+          toast('This GitHub account does not have owner access yet.');
+          return;
+        }
+        ownerAuthenticated = true;
+        const githubUsername = session.user.user_metadata?.user_name || session.user.user_metadata?.preferred_username;
+        ownerIdentity = githubUsername ? `@${githubUsername}` : session.user.email || 'GitHub account';
+        updateAuthButton();
+        const loaded = await loadOwnerData();
+        if (run !== applyingSession) return;
+        setPage('calendar');
+        setVisitorMode(loaded ? false : true, false);
+      }
+      async function initializeAuth() {
+        updateAuthButton();
+        if (!supabase) {
+          setConnectionNotice('Booking service isn’t connected', 'This preview cannot identify the owner or share booking requests yet. Connect Supabase to enable sign-in and shared data.');
+          renderCalendar();
+          return;
+        }
+        supabase.auth.onAuthStateChange((_event, session) => {
+          window.setTimeout(() => { void applyAuthSession(session); }, 0);
+        });
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          setConnectionNotice('Could not check sign-in', 'Refresh the page and verify the Supabase project URL and publishable key.');
+          return;
+        }
+        await applyAuthSession(data.session);
+      }
+
+      $('#prev-week').addEventListener('click', () => { week.setDate(week.getDate() - 7); renderCalendar(); });
+      $('#next-week').addEventListener('click', () => { week.setDate(week.getDate() + 7); renderCalendar(); });
+      $('#today-button').addEventListener('click', () => { week = startOfWeek(new Date()); renderCalendar(); });
+      $('#add-slot').addEventListener('click', () => openSlotModal());
+      $('#preview-button').addEventListener('click', () => setVisitorMode(!visitorMode));
+      $('#owner-mode').addEventListener('click', () => setVisitorMode(false));
+      $('#visitor-mode').addEventListener('click', () => setVisitorMode(true));
+      $('#auth-button').addEventListener('click', async () => {
+        if (ownerAuthenticated) {
+          await supabase.auth.signOut();
+          toast('Signed out');
+        } else void signInOwner();
+      });
+      $('#nav-calendar').addEventListener('click', () => setPage('calendar'));
+      $('#nav-requests').addEventListener('click', () => setPage('requests'));
+      $('#requests-back').addEventListener('click', () => setPage('calendar'));
+      $$('[data-close]').forEach(button => button.addEventListener('click', () => closeModal(button.dataset.close)));
+      $$('.modal-backdrop').forEach(backdrop => backdrop.addEventListener('click', event => { if (event.target === backdrop) backdrop.classList.remove('open'); }));
+      document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('.modal-backdrop.open').forEach(backdrop => backdrop.classList.remove('open')); });
+      $$('input[name="kind"]', $('#slot-form')).forEach(input => input.addEventListener('change', updateSlotFormKind));
+
+      $('#calendar-body').addEventListener('click', event => {
+        const book = event.target.closest('[data-book]');
+        const edit = event.target.closest('[data-edit]');
+        const pending = event.target.closest('[data-open-requests]');
+        if (book) { const slot = state.slots.find(item => item.id === book.dataset.book); if (slot) openBookingModal(slot); }
+        else if (edit) { const slot = state.slots.find(item => item.id === edit.dataset.edit); if (slot) openSlotModal(slot); }
+        else if (pending) setPage('requests');
+      });
+      $('#calendar-body').addEventListener('keydown', event => { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-book],[data-edit],[data-open-requests]')) { event.preventDefault(); event.target.click(); } });
+
+      $('#slot-form').addEventListener('submit', async event => {
+        event.preventDefault();
+        const form = new FormData(event.currentTarget);
+        const kind = form.get('kind');
+        const slot = { id: editingSlotId || uid(), kind, title: kind === 'availability' ? 'Open for booking' : String(form.get('title')).trim(), date: form.get('date'), start: form.get('start'), end: form.get('end'), visibility: kind === 'availability' ? 'public' : form.get('visibility') };
+        const error = $('#slot-error'); error.classList.remove('show');
+        if (!slot.date || !slot.start || !slot.end || timeMinutes(slot.end) <= timeMinutes(slot.start)) { showError('#slot-error', 'Choose an end time after the start time.'); return; }
+        if (timeMinutes(slot.start) < START_MINUTE || timeMinutes(slot.end) > END_MINUTE) { showError('#slot-error', 'Slots must be between 8:00 AM and 8:00 PM.'); return; }
+        if (kind === 'availability' && isPastSlot(slot.date, slot.start)) { showError('#slot-error', 'Booking availability must start in the future.'); return; }
+        if (overlapping(slot.date, slot.start, slot.end, editingSlotId)) { showError('#slot-error', 'This time overlaps another slot or booking. Choose a different time.'); return; }
+        if (editingSlotId) state.slots = state.slots.map(item => item.id === editingSlotId ? slot : item);
+        else state.slots.push(slot);
+        const saved = await save(); if (!saved) return;
+        closeModal('slot-modal-backdrop'); renderCalendar(); toast(editingSlotId ? 'Time slot updated' : 'Time slot added');
+      });
+      $('#delete-slot').addEventListener('click', async () => {
+        if (!editingSlotId) return;
+        const hasRequests = state.requests.some(r => r.slotId === editingSlotId && r.status !== 'declined');
+        if (hasRequests) { showError('#slot-error', 'This slot has booking requests. Decline or cancel them before deleting it.'); return; }
+        state.slots = state.slots.filter(item => item.id !== editingSlotId);
+        const saved = await save(); if (!saved) return;
+        closeModal('slot-modal-backdrop'); renderCalendar(); toast('Time slot deleted');
+      });
+      $('#booking-form').addEventListener('submit', async event => {
+        event.preventDefault();
+        const form = new FormData(event.currentTarget);
+        const slot = state.slots.find(item => item.id === bookingTargetId && item.kind === 'availability');
+        if (!slot) { showError('#booking-error', 'This time is no longer available.'); return; }
+        if (isPastSlot(slot.date, slot.start)) { showError('#booking-error', 'This time has already passed.'); return; }
+        if (overlapping(slot.date, slot.start, slot.end, slot.id)) { showError('#booking-error', 'This time is no longer available.'); return; }
+        const name = String(form.get('name')).trim(), email = String(form.get('email')).trim();
+        if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('#booking-error', 'Enter your name and a valid email address.'); return; }
+        const { error } = await supabase.rpc('request_booking', { p_slot_id: slot.id, p_name: name, p_email: email, p_note: String(form.get('note') || '').trim() });
+        if (error) { showError('#booking-error', 'This time is no longer available. Refresh the page and choose another time.'); await loadPublicSchedule(); return; }
+        closeModal('booking-modal-backdrop'); await loadPublicSchedule(); toast('Request sent — waiting for approval');
+      });
+
+      document.addEventListener('click', async event => {
+        const accept = event.target.closest('[data-accept]');
+        const decline = event.target.closest('[data-decline]');
+        const cancel = event.target.closest('[data-cancel-booking]');
+        if (accept) {
+          const request = state.requests.find(r => r.id === accept.dataset.accept && isPending(r));
+          if (!request) return;
+          if (isPastSlot(request.date, request.start)) { toast('This request is for a time that has already passed.'); return; }
+          if (overlapping(request.date, request.start, request.end, request.slotId)) { toast('This booking conflicts with another time slot.'); return; }
+          request.status = 'accepted';
+          if (!await save()) return;
+          renderRequests(); renderCalendar(); toast('Booking accepted and added to your timetable');
+        } else if (decline) {
+          const request = state.requests.find(r => r.id === decline.dataset.decline && isPending(r));
+          if (!request) return;
+          request.status = 'declined'; if (!await save()) return;
+          renderRequests(); renderCalendar(); toast('Request declined');
+        } else if (cancel) {
+          const request = state.requests.find(r => r.id === cancel.dataset.cancelBooking && isConfirmed(r));
+          if (!request) return;
+          request.status = 'declined';
+          if (!await save()) return;
+          renderRequests(); renderCalendar(); toast('Booking cancelled and time reopened');
+        }
+      });
+
+      renderCalendar();
+      setVisitorMode(true, false);
+      setPage('calendar');
+      void initializeAuth();
+    })();
+  </script>
+</body>
+</html>
