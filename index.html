@@ -182,6 +182,7 @@
     .modal { width: min(440px, 100%); max-height: min(90vh, 760px); overflow: auto; background: white; border-radius: 13px; box-shadow: var(--shadow); padding: 22px; animation: rise .18s ease; }
     @keyframes soft-reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes rise { from { opacity: .6; transform: translateY(7px) scale(.99); } to { opacity: 1; transform: none; } }
+    @keyframes picker-open { from { opacity: .65; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
     .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
     .modal-head h2 { margin: 0; font-size: 17px; letter-spacing: -.02em; color: #28354b; }
     .modal-head p { margin: 6px 0 0; color: #8993a3; font-size: 10px; line-height: 1.5; }
@@ -195,6 +196,36 @@
     .field input, .field textarea, .field select { width: 100%; min-height: 36px; border: 1px solid #e0e5ed; border-radius: 7px; outline: 0; padding: 8px 10px; color: #3f4b60; background: white; font-size: 11px; }
     .field textarea { min-height: 74px; resize: vertical; line-height: 1.5; }
     .field input:focus, .field textarea:focus, .field select:focus { border-color: #d29aab; box-shadow: 0 0 0 3px rgba(141,41,71,.1); }
+    .picker-control { position: relative; }
+    .picker-trigger { width: 100%; min-height: 39px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #e0e5ed; border-radius: 8px; padding: 0 11px; background: white; color: #3f4b60; font-size: 11px; text-align: left; transition: border-color .18s, box-shadow .18s, background .18s; }
+    .picker-trigger:hover { border-color: #d5a4b3; background: #fffdfd; }
+    .picker-trigger[aria-expanded="true"] { border-color: #a83a5a; box-shadow: 0 0 0 3px rgba(141,41,71,.1); }
+    .picker-trigger .placeholder { color: #929baa; }
+    .picker-trigger svg { width: 15px; height: 15px; color: #8d2947; flex: none; }
+    .picker-panel { margin-top: 7px; padding: 11px; border: 1px solid #ebe3e6; border-radius: 10px; background: white; box-shadow: 0 12px 28px rgba(62,27,44,.11); animation: picker-open .14s ease both; }
+    .picker-panel[hidden] { display: none; }
+    .date-picker-heading { display: grid; grid-template-columns: 32px 1fr 32px; align-items: center; gap: 5px; margin-bottom: 9px; }
+    .date-picker-heading strong { text-align: center; font-size: 11px; color: #3b2930; }
+    .picker-arrow { width: 30px; height: 30px; border: 1px solid transparent; border-radius: 7px; background: #faf6f8; color: #795064; display: grid; place-items: center; }
+    .picker-arrow:hover:not(:disabled) { background: #f5e8ed; color: #8d2947; }
+    .picker-arrow:disabled { opacity: .35; cursor: default; }
+    .picker-arrow svg { width: 14px; height: 14px; }
+    .calendar-weekdays, .calendar-days { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 3px; }
+    .calendar-weekday { padding: 5px 0; color: #9a8790; text-align: center; text-transform: uppercase; font-size: 8px; font-weight: 750; letter-spacing: .05em; }
+    .calendar-day { min-height: 31px; border: 0; border-radius: 7px; background: transparent; color: #4a4550; font-size: 10px; font-weight: 600; }
+    .calendar-day:hover:not(:disabled) { background: #f8edf1; color: #8d2947; }
+    .calendar-day.outside-month { color: #b5abb0; }
+    .calendar-day.today { box-shadow: inset 0 0 0 1px #ddb8c4; color: #8d2947; }
+    .calendar-day.selected { background: #8d2947; color: white; box-shadow: 0 3px 8px rgba(141,41,71,.2); }
+    .calendar-day:disabled { color: #d5d0d3; cursor: default; }
+    .picker-panel-foot { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0ecee; }
+    .picker-text-button { border: 0; padding: 4px 6px; background: transparent; color: #8d2947; font-size: 9px; font-weight: 700; }
+    .picker-text-button:hover { color: #682037; text-decoration: underline; }
+    .time-options { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 5px; max-height: 218px; overflow: auto; padding: 1px 2px 1px 1px; scrollbar-color: #d5b8c2 #faf7f8; scrollbar-width: thin; }
+    .time-option { min-height: 33px; border: 1px solid transparent; border-radius: 7px; background: #faf8f9; color: #514751; font-size: 9px; font-variant-numeric: tabular-nums; font-weight: 650; }
+    .time-option:hover { border-color: #ead5dd; background: #f8edf1; color: #8d2947; }
+    .time-option.selected { border-color: #b55a75; background: #8d2947; color: white; box-shadow: 0 3px 7px rgba(141,41,71,.16); }
+    .picker-hint { margin: 8px 2px 0; color: #9a8e94; font-size: 8px; }
     .type-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .type-option { position: relative; }
     .type-option input { position: absolute; opacity: 0; pointer-events: none; }
@@ -336,9 +367,9 @@
         </div></div>
         <div class="form-grid">
           <div class="field full" id="slot-title-field"><label for="slot-title">Name</label><input id="slot-title" name="title" maxlength="60" placeholder="e.g. Project focus" required /></div>
-          <div class="field"><label for="slot-date">Date</label><input type="date" id="slot-date" name="date" required /></div>
-          <div class="field"><label for="slot-start">Starts</label><select id="slot-start" name="start" required></select></div>
-          <div class="field"><label for="slot-end">Ends</label><select id="slot-end" name="end" required></select></div>
+          <div class="field full"><label for="slot-date-picker-button">Date</label><div class="picker-control date-picker" id="slot-date-picker" data-date-picker data-input="slot-date"><input type="hidden" id="slot-date" name="date" /><button class="picker-trigger" id="slot-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div>
+          <div class="field"><label for="slot-start-picker-button">Starts</label><div class="picker-control time-picker" id="slot-start-picker" data-time-picker data-input="slot-start" data-end="false"><input type="hidden" id="slot-start" name="start" /><button class="picker-trigger" id="slot-start-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div>
+          <div class="field"><label for="slot-end-picker-button">Ends</label><div class="picker-control time-picker" id="slot-end-picker" data-time-picker data-input="slot-end" data-end="true"><input type="hidden" id="slot-end" name="end" /><button class="picker-trigger" id="slot-end-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div>
           <div class="field full" id="visibility-field"><label>Who can see this slot?</label><div class="visibility-options">
             <div class="visibility-option"><input type="radio" name="visibility" value="public" id="visibility-public" checked><label for="visibility-public"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18m0-18a14 14 0 0 0 0 18"/></svg><span><strong>Public</strong><span>Others can see the name</span></span></label></div>
             <div class="visibility-option"><input type="radio" name="visibility" value="private" id="visibility-private"><label for="visibility-private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg><span><strong>Private</strong><span>Others only see unavailable</span></span></label></div>
@@ -354,7 +385,7 @@
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
       <div class="modal-head"><div><h2 id="booking-modal-title">Request this time</h2><p id="booking-slot-copy">No account needed. Add your name, phone, and a short message; email is optional.</p></div><button class="close-button" data-close="booking-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
       <form id="booking-form"><input type="hidden" name="slotId" id="booking-slot-id" />
-        <div class="form-grid" id="booking-time-fields" style="display:none"><div class="field full"><label for="booking-date">Requested date</label><input id="booking-date" name="requestDate" type="date" /></div><div class="field"><label for="booking-start">Starts</label><select id="booking-start" name="requestStart"></select></div><div class="field"><label for="booking-end">Ends</label><select id="booking-end" name="requestEnd"></select></div></div>
+        <div class="form-grid" id="booking-time-fields" style="display:none"><div class="field full"><label for="booking-date-picker-button">Requested date</label><div class="picker-control date-picker" id="booking-date-picker" data-date-picker data-input="booking-date"><input type="hidden" id="booking-date" name="requestDate" /><button class="picker-trigger" id="booking-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-start-picker-button">Starts</label><div class="picker-control time-picker" id="booking-start-picker" data-time-picker data-input="booking-start" data-end="false"><input type="hidden" id="booking-start" name="requestStart" /><button class="picker-trigger" id="booking-start-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-end-picker-button">Ends</label><div class="picker-control time-picker" id="booking-end-picker" data-time-picker data-input="booking-end" data-end="true"><input type="hidden" id="booking-end" name="requestEnd" /><button class="picker-trigger" id="booking-end-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div></div>
         <div class="form-grid" style="margin-top:13px"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required placeholder="Name" /></div><div class="field full"><label for="booker-phone">Your phone</label><input id="booker-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" minlength="7" maxlength="32" required placeholder="+84 912 345 678" /></div><div class="field full"><label for="booker-email">Email <span class="optional-label">(optional)</span></label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">Short message</label><textarea id="booking-note" name="note" maxlength="300" required placeholder="What would you like to discuss? (up to 300 characters)"></textarea></div></div>
         <p class="modal-error" id="booking-error"></p><div class="modal-actions"><span></span><div class="right-actions"><button class="button" type="button" data-close="booking-modal-backdrop">Cancel</button><button class="button primary" type="submit">Send request</button></div></div>
       </form>
@@ -365,7 +396,7 @@
   <script src="./supabase-config.js"></script>
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-    import { DAY_START_MINUTE, DAY_END_MINUTE, nextRequestWindow, rangesOverlap, timeMinutes, timeOptions, validateRequestContact, validateTimeRange } from './timetable-rules.mjs';
+    import { DAY_START_MINUTE, DAY_END_MINUTE, monthCalendarDates, nextRequestWindow, rangesOverlap, timeMinutes, timeOptions, validateRequestContact, validateTimeRange } from './timetable-rules.mjs';
     (() => {
       const PX_PER_MINUTE = 32 / 30;
       const HCMC_TIME = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Ho_Chi_Minh', hour: 'numeric', minute: '2-digit' });
@@ -536,16 +567,86 @@
       }
       const isPastSlot = (date, time) => { const now = Object.fromEntries(HCMC_CLOCK.formatToParts(new Date()).map(part => [part.type, part.value])); const today = `${now.year}-${now.month}-${now.day}`; const currentMinute = Number(now.hour) * 60 + Number(now.minute); return date < today || date === today && timeMinutes(time) <= currentMinute; };
       const formatTime = value => { const [h,m] = value.split(':').map(Number); const d = new Date(2000, 0, 1, h, m); return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: m ? '2-digit' : undefined }); };
-      function populateTimeSelect(selector, end, selected) {
-        const select = $(selector);
-        select.innerHTML = timeOptions({ end }).map(value => `<option value="${value}">${formatTime(value)}${value === '24:00' ? ' (midnight)' : ''}</option>`).join('');
-        select.value = selected;
+      const pickerTimeLabel = value => value === '24:00' ? '12:00 AM · midnight' : new Date(2000, 0, 1, ...value.split(':').map(Number)).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      const monthKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
+      function closePickers(except = null) {
+        $$('[data-picker-panel]').forEach(panel => {
+          const widget = panel.closest('.picker-control');
+          if (widget === except) return;
+          panel.hidden = true;
+          $('[data-picker-trigger]', widget).setAttribute('aria-expanded', 'false');
+        });
       }
-      function initializeTimeSelects() {
-        populateTimeSelect('#slot-start', false, '09:00');
-        populateTimeSelect('#slot-end', true, '10:00');
-        populateTimeSelect('#booking-start', false, '09:00');
-        populateTimeSelect('#booking-end', true, '09:30');
+      function setDateValue(inputId, value) {
+        const input = $(`#${inputId}`), widget = $(`[data-date-picker][data-input="${inputId}"]`);
+        input.value = value || '';
+        const label = $('[data-picker-label]', widget);
+        label.textContent = value ? fromKey(value).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'Choose a date';
+        label.classList.toggle('placeholder', !value);
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      function setTimeValue(inputId, value) {
+        const input = $(`#${inputId}`), widget = $(`[data-time-picker][data-input="${inputId}"]`);
+        input.value = value || '';
+        const label = $('[data-picker-label]', widget);
+        label.textContent = value ? pickerTimeLabel(value) : 'Choose a time';
+        label.classList.toggle('placeholder', !value);
+      }
+      function renderDatePicker(widget) {
+        const input = $(`#${widget.dataset.input}`);
+        const selected = input.value;
+        const month = widget.dataset.month || (selected ? selected.slice(0, 7) : dateKey(new Date()).slice(0, 7));
+        const [year, monthNumber] = month.split('-').map(Number);
+        const firstDay = new Date(year, monthNumber - 1, 1, 12);
+        const title = firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        const minDate = widget.dataset.minDate || '';
+        const priorMonth = new Date(year, monthNumber - 2, 1, 12);
+        const priorDisabled = minDate && monthKey(priorMonth) < minDate.slice(0, 7);
+        const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const today = dateKey(new Date());
+        const dates = monthCalendarDates(year, monthNumber);
+        const days = dates.map(key => {
+          const date = fromKey(key);
+          const outside = date.getMonth() !== monthNumber - 1;
+          const disabled = minDate && key < minDate;
+          const classes = ['calendar-day', outside ? 'outside-month' : '', key === today ? 'today' : '', key === selected ? 'selected' : ''].filter(Boolean).join(' ');
+          return `<button type="button" class="${classes}" data-calendar-date="${key}" ${disabled ? 'disabled' : ''} aria-label="${date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}" aria-pressed="${key === selected}">${date.getDate()}</button>`;
+        }).join('');
+        widget.dataset.month = month;
+        $('[data-picker-panel]', widget).innerHTML = `<div class="date-picker-heading"><button type="button" class="picker-arrow" data-calendar-nav="-1" aria-label="Previous month" ${priorDisabled ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button><strong>${title}</strong><button type="button" class="picker-arrow" data-calendar-nav="1" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button></div><div class="calendar-weekdays">${weekdays.map(day => `<span class="calendar-weekday">${day}</span>`).join('')}</div><div class="calendar-days">${days}</div><div class="picker-panel-foot"><button type="button" class="picker-text-button" data-calendar-today>Today</button></div>`;
+      }
+      function renderTimePicker(widget) {
+        const input = $(`#${widget.dataset.input}`);
+        const end = widget.dataset.end === 'true';
+        const options = timeOptions({ end });
+        $('[data-picker-panel]', widget).innerHTML = `<div class="time-options" role="listbox" aria-label="Choose ${end ? 'end' : 'start'} time">${options.map(value => `<button type="button" role="option" aria-selected="${value === input.value}" class="time-option ${value === input.value ? 'selected' : ''}" data-picker-time="${value}">${pickerTimeLabel(value)}</button>`).join('')}</div><p class="picker-hint">30-minute steps${end ? ' · 12:00 AM ends the day' : ''}</p>`;
+      }
+      function initializePickers() {
+        $$('[data-time-picker]').forEach(widget => setTimeValue(widget.dataset.input, widget.dataset.input === 'slot-start' || widget.dataset.input === 'booking-start' ? '09:00' : widget.dataset.input === 'slot-end' ? '10:00' : '09:30'));
+        $$('[data-date-picker]').forEach(widget => setDateValue(widget.dataset.input, ''));
+      }
+      function setDatePickerMin(inputId, minDate = '') {
+        const widget = $(`[data-date-picker][data-input="${inputId}"]`);
+        widget.dataset.minDate = minDate;
+        if (!minDate) delete widget.dataset.minDate;
+      }
+      function togglePicker(widget) {
+        const panel = $('[data-picker-panel]', widget), wasOpen = !panel.hidden;
+        closePickers();
+        if (wasOpen) return;
+        if (widget.matches('[data-date-picker]')) {
+          const selected = $(`#${widget.dataset.input}`).value;
+          widget.dataset.month = selected ? selected.slice(0, 7) : dateKey(new Date()).slice(0, 7);
+          renderDatePicker(widget);
+        } else renderTimePicker(widget);
+        panel.hidden = false;
+        $('[data-picker-trigger]', widget).setAttribute('aria-expanded', 'true');
+        panel.querySelector('.selected')?.focus();
+      }
+      function stepPickerMonth(widget, amount) {
+        const [year, month] = widget.dataset.month.split('-').map(Number);
+        widget.dataset.month = monthKey(new Date(year, month - 1 + amount, 1, 12));
+        renderDatePicker(widget);
       }
       const formatDate = (key, options = { weekday: 'long', month: 'long', day: 'numeric' }) => fromKey(key).toLocaleDateString('en-US', options);
       const slotEnd = slot => timeMinutes(slot.end);
@@ -709,14 +810,16 @@
       function openSlotModal(slot = null, date = null) {
         if (visitorMode || !ownerView) return;
         editingSlotId = slot?.id || null;
+        closePickers();
         const form = $('#slot-form'); form.reset();
         $('#slot-modal-title').textContent = slot ? 'Edit time slot' : 'Add time slot';
         $('#save-slot').textContent = slot ? 'Save changes' : 'Save slot';
         $('#delete-slot').hidden = !slot;
         $('#slot-error').classList.remove('show');
-        $('#slot-date').value = slot?.date || date || dateKey(new Date());
-        $('#slot-start').value = slot?.start || '09:00';
-        $('#slot-end').value = slot?.end || '10:00';
+        setDatePickerMin('slot-date');
+        setDateValue('slot-date', slot?.date || date || dateKey(new Date()));
+        setTimeValue('slot-start', slot?.start || '09:00');
+        setTimeValue('slot-end', slot?.end || '10:00');
         $('#slot-title').value = slot?.title || '';
         $(`input[name="kind"][value="${slot?.kind || 'event'}"]`).checked = true;
         $(`input[name="visibility"][value="${slot?.visibility || 'public'}"]`).checked = true;
@@ -733,26 +836,26 @@
       function openBookingModal(slot = null) {
         if (!supabase) { toast('Online booking is not connected yet.'); return; }
         bookingTargetId = slot?.id || null;
+        closePickers();
         $('#booking-form').reset();
         $('#booking-slot-id').value = slot?.id || '';
         $('#booking-error').classList.remove('show');
         const timeFields = $('#booking-time-fields');
         timeFields.style.display = slot ? 'none' : 'grid';
-        ['booking-date', 'booking-start', 'booking-end'].forEach(id => { $(`#${id}`).required = !slot; });
         if (slot) {
           $('#booking-slot-copy').textContent = `${formatDate(slot.date)} · ${formatTime(slot.start)} – ${formatTime(slot.end)}. No account needed; your name, phone, and short message are required. Email is optional.`;
         } else {
           const suggested = nextRequestWindow();
-          $('#booking-date').min = dateKey(new Date());
-          $('#booking-date').value = suggested.date;
-          $('#booking-start').value = suggested.start;
-          $('#booking-end').value = suggested.end;
+          setDatePickerMin('booking-date', dateKey(new Date()));
+          setDateValue('booking-date', suggested.date);
+          setTimeValue('booking-start', suggested.start);
+          setTimeValue('booking-end', suggested.end);
           $('#booking-slot-copy').textContent = 'No account needed. Suggest a free time; your request stays pending until the owner accepts it. Name, phone, and a short message are required; email is optional.';
         }
         $('#booking-modal-backdrop').classList.add('open');
         setTimeout(() => $('#booker-name').focus(), 40);
       }
-      function closeModal(id) { $(`#${id}`).classList.remove('open'); }
+      function closeModal(id) { closePickers(); $(`#${id}`).classList.remove('open'); }
       function showError(selector, message) { const el = $(selector); el.textContent = message; el.classList.add('show'); }
       async function applyAuthSession(session) {
         const sessionKey = session?.user?.id || null;
@@ -859,8 +962,27 @@
       $('#nav-requests').addEventListener('click', () => setPage('requests'));
       $('#requests-back').addEventListener('click', () => setPage('calendar'));
       $$('[data-close]').forEach(button => button.addEventListener('click', () => closeModal(button.dataset.close)));
-      $$('.modal-backdrop').forEach(backdrop => backdrop.addEventListener('click', event => { if (event.target === backdrop) backdrop.classList.remove('open'); }));
-      document.addEventListener('keydown', event => { if (event.key === 'Escape') $$('.modal-backdrop.open').forEach(backdrop => backdrop.classList.remove('open')); });
+      $$('.modal-backdrop').forEach(backdrop => backdrop.addEventListener('click', event => { if (event.target === backdrop) { closePickers(); backdrop.classList.remove('open'); } }));
+      document.addEventListener('click', event => {
+        const trigger = event.target.closest('[data-picker-trigger]');
+        if (trigger) { togglePicker(trigger.closest('.picker-control')); return; }
+        const navigation = event.target.closest('[data-calendar-nav]');
+        if (navigation) { stepPickerMonth(navigation.closest('[data-date-picker]'), Number(navigation.dataset.calendarNav)); return; }
+        const today = event.target.closest('[data-calendar-today]');
+        if (today) { const widget = today.closest('[data-date-picker]'); const minDate = widget.dataset.minDate || ''; const currentDay = dateKey(new Date()); if (!minDate || currentDay >= minDate) setDateValue(widget.dataset.input, currentDay); closePickers(); return; }
+        const day = event.target.closest('[data-calendar-date]');
+        if (day) { const widget = day.closest('[data-date-picker]'); setDateValue(widget.dataset.input, day.dataset.calendarDate); closePickers(); return; }
+        const time = event.target.closest('[data-picker-time]');
+        if (time) { const widget = time.closest('[data-time-picker]'); setTimeValue(widget.dataset.input, time.dataset.pickerTime); closePickers(); return; }
+        if (!event.target.closest('.picker-control')) closePickers();
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key !== 'Escape') return;
+        const openPanel = $('[data-picker-panel]:not([hidden])');
+        if (openPanel) { closePickers(); event.preventDefault(); return; }
+        closePickers();
+        $$('.modal-backdrop.open').forEach(backdrop => backdrop.classList.remove('open'));
+      });
       $$('input[name="kind"]', $('#slot-form')).forEach(input => input.addEventListener('change', updateSlotFormKind));
 
       $('#calendar-body').addEventListener('click', event => {
@@ -952,7 +1074,7 @@
         }
       });
 
-      initializeTimeSelects();
+      initializePickers();
       updateHeaderClock();
       renderCalendar();
       setVisitorMode(true, false);

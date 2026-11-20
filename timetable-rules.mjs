@@ -71,3 +71,15 @@ export function timeOptions({ end = false } = {}) {
   for (let minute = first; minute <= last; minute += 30) values.push(formatMinute(minute));
   return values;
 }
+
+export function monthCalendarDates(year, month) {
+  const firstDay = new Date(year, month - 1, 1, 12);
+  const leadingDays = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month, 0, 12).getDate();
+  const cellCount = Math.ceil((leadingDays + daysInMonth) / 7) * 7;
+  const pad = value => String(value).padStart(2, '0');
+  return Array.from({ length: cellCount }, (_, index) => {
+    const date = new Date(year, month - 1, index - leadingDays + 1, 12);
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  });
+}

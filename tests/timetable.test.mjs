@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   DAY_END_MINUTE,
   DAY_START_MINUTE,
+  monthCalendarDates,
   nextRequestWindow,
   rangesOverlap,
   timeMinutes,
@@ -38,6 +39,16 @@ test('time pickers include all half hours and midnight as an end time', () => {
   assert.equal(ends.length, 48);
   assert.equal(ends[0], '00:30');
   assert.equal(ends.at(-1), '24:00');
+});
+
+test('date picker months align Monday first and include leap days', () => {
+  const november = monthCalendarDates(2026, 11);
+  assert.equal(november[0], '2026-10-26');
+  assert.equal(november[6], '2026-11-01');
+  assert.equal(november.at(-1), '2026-12-06');
+  const february = monthCalendarDates(2024, 2);
+  assert.equal(february.includes('2024-02-29'), true);
+  assert.equal(february.length % 7, 0);
 });
 
 test('suggested requests can use late-night times and roll over at midnight', () => {
