@@ -6,6 +6,7 @@ import {
   DAY_START_MINUTE,
   draggedMinuteRange,
   formatScheduleTimestamp,
+  isPastDate,
   monthCalendarDates,
   nextRequestWindow,
   rangesOverlap,
@@ -23,6 +24,12 @@ test('the supported timetable range is the full day', () => {
   assert.equal(timeMinutes('24:00'), 1440);
   assert.equal(validateTimeRange('00:00', '00:30'), true);
   assert.equal(validateTimeRange('23:30', '24:00'), true);
+});
+
+test('only dates before today are marked as past', () => {
+  assert.equal(isPastDate('2026-11-20', '2026-11-21'), true);
+  assert.equal(isPastDate('2026-11-21', '2026-11-21'), false);
+  assert.equal(isPastDate('2026-11-22', '2026-11-21'), false);
 });
 
 test('time ranges reject invalid clocks, empty durations, and 24:00 starts', () => {

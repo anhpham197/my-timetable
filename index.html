@@ -102,12 +102,14 @@
     .day-head-cell .date-number { display: inline-grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; color: #4d5a72; margin-top: 5px; font-size: 11px; letter-spacing: 0; }
     .day-head-cell.today { color: var(--blue); }
     .day-head-cell.today .date-number { background: var(--blue); color: white; }
+    .day-head-cell.past-day { opacity: .48; filter: grayscale(.7); }
     .calendar-body { display: grid; grid-template-columns: 65px repeat(7, minmax(0,1fr)); }
     .time-rail { position: sticky; left: 0; z-index: 3; border-right: 1px solid var(--line); background: #fdfdfe; }
     .hour-label { position: absolute; right: 8px; transform: translateY(-50%); font-size: 9px; color: #9ba4b3; white-space: nowrap; }
     .hour-label:first-child { transform: none; }
     .day-column { position: relative; border-right: 1px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, #f0f2f6 31px, #f0f2f6 32px, transparent 32px, transparent 63px, #e7eaf0 63px, #e7eaf0 64px); }
     .day-column:last-child { border-right: 0; }
+    .day-column.past-day { opacity: .48; filter: grayscale(.75) blur(.3px); }
     .calendar-body.requestable .day-column { cursor: crosshair; touch-action: pan-y; }
     .drag-selection-preview { position: absolute; left: 4px; right: 4px; z-index: 4; border: 1px solid #8d2947; border-left-width: 3px; border-radius: 6px; background: rgba(141,41,71,.2); box-shadow: 0 2px 10px rgba(141,41,71,.15); color: #682037; pointer-events: none; padding: 4px 6px; overflow: hidden; font-size: 9px; font-weight: 750; font-variant-numeric: tabular-nums; }
     .drag-selection-preview::after { content: "Release to request"; display: block; margin-top: 2px; font-size: 8px; font-weight: 600; opacity: .78; }
@@ -422,7 +424,7 @@
   <script src="./supabase-config.js"></script>
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-    import { DAY_START_MINUTE, DAY_END_MINUTE, draggedMinuteRange, formatScheduleTimestamp, monthCalendarDates, nextRequestWindow, rangesOverlap, timeMinutes, timePickerHours, timePickerMinutes, validateRequestContact, validateTimeRange } from './timetable-rules.mjs';
+    import { DAY_START_MINUTE, DAY_END_MINUTE, draggedMinuteRange, formatScheduleTimestamp, isPastDate, monthCalendarDates, nextRequestWindow, rangesOverlap, timeMinutes, timePickerHours, timePickerMinutes, validateRequestContact, validateTimeRange } from './timetable-rules.mjs';
     (() => {
       const PX_PER_MINUTE = 32 / 30;
       const HCMC_TIMESTAMP = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
@@ -747,8 +749,8 @@
         const dates = weekDates();
         const todayKey = dateKey(new Date());
         $('#day-head').innerHTML = `<div class="day-head-spacer"></div>` + dates.map(date => {
-          const key = dateKey(date), today = key === todayKey;
-          return `<div class="day-head-cell ${today ? 'today' : ''}">${date.toLocaleDateString('en-US', { weekday: 'short' })}<br><span class="date-number">${date.getDate()}</span></div>`;
+          const key = dateKey(date), today = key === todayKey, past = isPastDate(key, todayKey);
+          return `<div class="day-head-cell ${today ? 'today' : ''} ${past ? 'past-day' : ''}" ${past ? 'title="Past day"' : ''}>${date.toLocaleDateString('en-US', { weekday: 'short' })}<br><span class="date-number">${date.getDate()}</span></div>`;
         }).join('');
         let body = '<div class="time-rail">';
         for (let hour = 0; hour < 24; hour++) {
@@ -757,8 +759,8 @@
         }
         body += '</div>';
         dates.forEach(date => {
-          const key = dateKey(date), today = key === todayKey;
-          body += `<div class="day-column ${today ? 'today-column' : ''}" data-date="${key}">`;
+          const key = dateKey(date), today = key === todayKey, past = isPastDate(key, todayKey);
+          body += `<div class="day-column ${today ? 'today-column' : ''} ${past ? 'past-day' : ''}" data-date="${key}" ${past ? 'title="Past day"' : ''}>`;
           for (const item of itemEventsForDay(key)) {
             const start = timeMinutes(item.start), end = slotEnd(item);
             if (end <= DAY_START_MINUTE || start >= DAY_END_MINUTE) continue;

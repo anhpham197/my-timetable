@@ -11,6 +11,10 @@ export function timeMinutes(value) {
   return hour * 60 + minute;
 }
 
+export function isPastDate(dateKey, todayKey) {
+  return String(dateKey) < String(todayKey);
+}
+
 export function validateTimeRange(start, end) {
   const startMinute = timeMinutes(start);
   const endMinute = timeMinutes(end);
