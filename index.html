@@ -424,7 +424,7 @@
   <script src="./supabase-config.js"></script>
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-    import { DAY_START_MINUTE, DAY_END_MINUTE, draggedMinuteRange, formatScheduleTimestamp, isPastDate, monthCalendarDates, nextRequestWindow, rangesOverlap, timeMinutes, timePickerHours, timePickerMinutes, validateRequestContact, validateTimeRange } from './timetable-rules.mjs';
+    import { DAY_START_MINUTE, DAY_END_MINUTE, draggedMinuteRange, formatScheduleTimestamp, isPastDate, monthCalendarDates, nextRequestWindow, rangesOverlap, timeMinutes, timePickerHours, timePickerMinutes, validateRequestContact, validateTimeRange } from './timetable-rules.mjs?v=38e6d20';
     (() => {
       const PX_PER_MINUTE = 32 / 30;
       const HCMC_TIMESTAMP = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
