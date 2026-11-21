@@ -6,7 +6,7 @@ A public timetable and booking page designed for GitHub Pages. Every visit opens
 
 The page uses Supabase Auth and Postgres with Row Level Security. GitHub Pages serves the frontend; Supabase verifies the owner and stores shared schedule data. The database returns only sanitized public rows to signed-out visitors.
 
-1. Create a Supabase project and run [`supabase/schema.sql`](supabase/schema.sql) in its SQL Editor.
+1. Create a Supabase project. The database schema and migrations are applied in Supabase and kept out of this GitHub Pages repository.
 2. Deploy the site to GitHub Pages so you have its final URL, such as `https://<username>.github.io/<repository>/`.
 3. Create a GitHub OAuth App under **GitHub Settings → Developer settings → OAuth Apps**. Set its homepage URL to your deployed page. For its authorization callback URL, copy the GitHub callback shown in Supabase under **Authentication → Sign In / Providers → GitHub**. It looks like `https://<project-ref>.supabase.co/auth/v1/callback`.
 4. In Supabase **Authentication → Sign In / Providers → GitHub**, enable GitHub and enter the OAuth App's client ID and client secret. In **Authentication → URL Configuration**, set the Site URL to your deployed GitHub Pages URL and add that URL to the allowed redirect URLs. See the [Supabase GitHub sign-in guide](https://supabase.com/docs/guides/auth/social-sign-in/auth-github).
@@ -29,7 +29,7 @@ Run the timetable rule tests with `node --test`.
 ## Privacy and access
 
 - Anyone can read the public schedule through a database function that changes private names to “Unavailable”.
-- The calendar shows the full day, midnight to midnight. Visitors can request a listed opening or suggest another unblocked time without signing in. Requests stay pending in the owner's inbox until accepted or declined, and the inbox refreshes while owner view is open. For an existing project, apply [`supabase/migrations/20261121_full_day_contact_fields.sql`](supabase/migrations/20261121_full_day_contact_fields.sql) in the Supabase SQL Editor. The earlier guest-request migration is only needed if that project has not already had it applied.
+- The calendar shows the full day, midnight to midnight. Visitors can request a listed opening or suggest another unblocked time without signing in. Requests stay pending in the owner's inbox until accepted or declined, and the inbox refreshes while owner view is open. Owners can add personal activities and meetings with others; open booking times are created separately. Apply database changes in Supabase; GitHub Pages serves only the frontend.
 - Only the configured Supabase Auth user ID, associated with your GitHub sign-in, can read private event names, edit slots, or manage requests. The database enforces this with Row Level Security.
 - The Supabase publishable key is visible in the page by design. The schema does not grant public access to raw timetable or booking tables.
 - Keep the `private` schema out of Supabase's exposed API schemas. The policies use it only for an owner check. See [Supabase Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).

@@ -1,0 +1,3 @@
+# Supabase SQL is applied in Supabase and kept local to this workspace.
+/supabase/*.sql
+/supabase/migrations/*.sql
