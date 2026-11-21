@@ -34,6 +34,49 @@ export function normalizeSlotEventType(kind, eventType) {
   return eventType === 'meeting' ? 'meeting' : 'personal';
 }
 
+export function eventDisplayMetrics(durationMinutes, pixelsPerMinute) {
+  const duration = Math.max(0, Number(durationMinutes) || 0);
+  const scale = Math.max(0, Number(pixelsPerMinute) || 0);
+  const height = duration * scale;
+  const short = height < 38;
+  const topInset = short && height > 2 ? 1 : 0;
+  return {
+    height,
+    short,
+    compact: height < 20,
+    topInset,
+    renderedHeight: Math.max(1, height - (topInset * 2))
+  };
+}
+
+export function requestableDayStartMinute(dateKey, todayKey, currentMinute) {
+  if (String(dateKey) < String(todayKey)) return null;
+  if (String(dateKey) > String(todayKey)) return DAY_START_MINUTE;
+  return Math.min(DAY_END_MINUTE, Math.max(DAY_START_MINUTE, Math.trunc(Number(currentMinute) || 0) + 1));
+}
+
+export function freeRequestRanges(items, startMinute = DAY_START_MINUTE, endMinute = DAY_END_MINUTE) {
+  const from = Math.max(DAY_START_MINUTE, Math.min(DAY_END_MINUTE, Math.trunc(Number(startMinute) || 0)));
+  const to = Math.max(from, Math.min(DAY_END_MINUTE, Math.trunc(Number(endMinute) || 0)));
+  if (to <= from) return [];
+
+  const busy = (Array.isArray(items) ? items : [])
+    .map(item => ({ start: timeMinutes(item.start), end: timeMinutes(item.end) }))
+    .filter(range => Number.isFinite(range.start) && Number.isFinite(range.end) && range.end > from && range.start < to)
+    .map(range => ({ start: Math.max(from, range.start), end: Math.min(to, range.end) }))
+    .sort((a, b) => a.start - b.start || a.end - b.end);
+
+  const free = [];
+  let cursor = from;
+  for (const range of busy) {
+    if (range.start > cursor) free.push({ start: cursor, end: range.start });
+    cursor = Math.max(cursor, range.end);
+    if (cursor >= to) break;
+  }
+  if (cursor < to) free.push({ start: cursor, end: to });
+  return free;
+}
+
 export function validateTimeRange(start, end) {
   const startMinute = timeMinutes(start);
   const endMinute = timeMinutes(end);

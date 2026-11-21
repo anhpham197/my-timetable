@@ -6,11 +6,14 @@ import {
   DAY_START_MINUTE,
   canNavigateToPreviousWeek,
   draggedMinuteRange,
+  eventDisplayMetrics,
+  freeRequestRanges,
   formatScheduleTimestamp,
   isPastDate,
   monthCalendarDates,
   nextRequestWindow,
   normalizeSlotEventType,
+  requestableDayStartMinute,
   rangesOverlap,
   resolveSlotSelection,
   timeMinutes,
@@ -53,6 +56,38 @@ test('event type persistence keeps legacy events personal and excludes availabil
   assert.equal(normalizeSlotEventType('event', 'personal'), 'personal');
   assert.equal(normalizeSlotEventType('event', null), 'personal');
   assert.equal(normalizeSlotEventType('availability', 'meeting'), null);
+});
+
+test('short calendar events keep their true duration without overlapping the next event', () => {
+  const request = eventDisplayMetrics(13, 32 / 30);
+  assert.ok(Math.abs(request.height - 13.8667) < 0.001);
+  assert.equal(request.short, true);
+  assert.equal(request.compact, true);
+  assert.ok(request.topInset + request.renderedHeight <= request.height);
+  const meeting = eventDisplayMetrics(90, 32 / 30);
+  assert.equal(meeting.short, false);
+  assert.equal(meeting.compact, false);
+  assert.equal(meeting.topInset, 0);
+  assert.equal(meeting.renderedHeight, meeting.height);
+});
+
+test('requestable calendar shading starts in the future and skips past days', () => {
+  assert.equal(requestableDayStartMinute('2026-11-20', '2026-11-21', 600), null);
+  assert.equal(requestableDayStartMinute('2026-11-21', '2026-11-21', 600), 601);
+  assert.equal(requestableDayStartMinute('2026-11-22', '2026-11-21', 600), 0);
+  assert.equal(requestableDayStartMinute('2026-11-21', '2026-11-21', 1439), DAY_END_MINUTE);
+});
+
+test('requestable green shading excludes booked and unavailable ranges', () => {
+  const ranges = freeRequestRanges([
+    { start: '18:00', end: '19:30' },
+    { start: '19:00', end: '20:00' }
+  ], 17 * 60, 21 * 60);
+  assert.deepEqual(ranges, [
+    { start: 17 * 60, end: 18 * 60 },
+    { start: 20 * 60, end: 21 * 60 }
+  ]);
+  assert.deepEqual(freeRequestRanges([{ start: '23:00', end: '24:00' }], 23 * 60, 24 * 60), []);
 });
 
 test('time ranges reject invalid clocks, empty durations, and 24:00 starts', () => {

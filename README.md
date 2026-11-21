@@ -1,35 +1,18 @@
-# Timetable
+# Book a meeting with Anh
 
-A public timetable and booking page designed for GitHub Pages. Every visit opens the sanitized public schedule, even when the owner has a saved sign-in session. Choose **Owner sign in** to open the private timetable and manage booking requests.
+Use the calendar to see public events and request a time to meet with me. You don’t need an account or sign in.
 
-## Connect the owner sign-in and shared data
+## How to request a meeting
 
-The page uses Supabase Auth and Postgres with Row Level Security. GitHub Pages serves the frontend; Supabase verifies the owner and stores shared schedule data. The database returns only sanitized public rows to signed-out visitors.
+1. Browse the calendar by week. Scroll the calendar to see different times of day.
+2. Click a green available time, or click **Request a time** to suggest another free time. You can also drag across a free part of the calendar to choose a time range.
+3. Enter your name, phone number, and a short message. Email is optional.
+4. Send the request. It stays pending until I accept or decline it.
 
-1. Create a Supabase project. The database schema and migrations are applied in Supabase and kept out of this GitHub Pages repository.
-2. Deploy the site to GitHub Pages so you have its final URL, such as `https://<username>.github.io/<repository>/`.
-3. Create a GitHub OAuth App under **GitHub Settings → Developer settings → OAuth Apps**. Set its homepage URL to your deployed page. For its authorization callback URL, copy the GitHub callback shown in Supabase under **Authentication → Sign In / Providers → GitHub**. It looks like `https://<project-ref>.supabase.co/auth/v1/callback`.
-4. In Supabase **Authentication → Sign In / Providers → GitHub**, enable GitHub and enter the OAuth App's client ID and client secret. In **Authentication → URL Configuration**, set the Site URL to your deployed GitHub Pages URL and add that URL to the allowed redirect URLs. See the [Supabase GitHub sign-in guide](https://supabase.com/docs/guides/auth/social-sign-in/auth-github).
-5. In `supabase-config.js`, set your project URL and **publishable key** from the Supabase dashboard. Publishable keys are intended for browser use; never put a Supabase secret or service-role key in this file. See [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys). If you don't want to edit locally, open this file on GitHub.com, use the edit button, and commit the change there.
-6. Deploy the config change, open your timetable, and choose **Owner sign in**. GitHub will ask you to authorize the app and return you to the timetable. The first sign-in creates your Supabase Auth user; until ownership is assigned, the page will sign that account out.
-7. In Supabase **Authentication → Users**, copy that user's UUID. In the SQL Editor, assign it as the owner:
+A request is not a confirmed meeting until I accept it. Accepted meetings appear as **Booked** on the calendar.
 
-   ```sql
-   insert into private.timetable_settings (singleton, owner_id)
-   values (true, 'PASTE-YOUR-AUTH-USER-UUID-HERE')
-   on conflict (singleton) do update set owner_id = excluded.owner_id;
-   ```
+## Reading the calendar
 
-8. Choose **Owner sign in** again. That sign-in opens your owner timetable; future visits still start on the public schedule until you choose **Owner sign in**. Visitors can request an open time without an account. Their name, phone number, and short message are required; email is optional.
-
-For local use, serve this folder over HTTP (for example, `python3 -m http.server 8000`) and open `http://localhost:8000`.
-
-Run the timetable rule tests with `node --test`.
-
-## Privacy and access
-
-- Anyone can read the public schedule through a database function that changes private names to “Unavailable”.
-- The calendar shows the full day, midnight to midnight. Visitors can request a listed opening or suggest another unblocked time without signing in. Requests stay pending in the owner's inbox until accepted or declined, and the inbox refreshes while owner view is open. Owners can add personal activities and meetings with others; open booking times are created separately. Apply database changes in Supabase; GitHub Pages serves only the frontend.
-- Only the configured Supabase Auth user ID, associated with your GitHub sign-in, can read private event names, edit slots, or manage requests. The database enforces this with Row Level Security.
-- The Supabase publishable key is visible in the page by design. The schema does not grant public access to raw timetable or booking tables.
-- Keep the `private` schema out of Supabase's exposed API schemas. The policies use it only for an owner check. See [Supabase Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
+- Public events show their names and times.
+- Private events and booked times appear as **Unavailable** or **Booked**.
+- Calendar times are shown in Ho Chi Minh City time (GMT+7).

@@ -120,15 +120,21 @@
     .drag-selection-preview::after { content: "Release to request"; display: block; margin-top: 2px; font-size: 8px; font-weight: 600; opacity: .78; }
     body.dragging-calendar { user-select: none; cursor: crosshair; }
     .day-column.today-column { background-color: #fcfcff; }
-    .calendar-event { position: absolute; left: 5px; right: 5px; min-height: 31px; overflow: hidden; border-radius: 6px; border-left: 3px solid; padding: 5px 6px 4px; cursor: pointer; z-index: 1; transition: filter .15s, transform .15s; }
+    .calendar-event { position: absolute; left: 5px; right: 5px; min-height: 0; overflow: hidden; border-radius: 6px; border-left: 3px solid; padding: 5px 6px 4px; cursor: pointer; z-index: 1; transition: filter .15s, transform .15s; }
+    .calendar-event.short { padding: 3px 5px 2px; }
+    .calendar-event.short span { display: none; }
+    .calendar-event.compact { padding: 0; border-left-width: 4px; border-radius: 4px; }
+    .calendar-event.compact strong { display: block; padding: 0 3px; font-size: 7px; line-height: 9px; }
+    .calendar-event.compact span { display: none; }
     .calendar-event:hover { filter: saturate(1.15); transform: translateY(-1px); z-index: 3; }
     .calendar-event strong { display: block; font-size: 9px; line-height: 1.25; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .calendar-event span { display: block; margin-top: 3px; font-size: 8px; opacity: .82; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .calendar-event.public { color: #79334a; background: #f8edf1; border-color: #b95775; }
-    .calendar-event.private { color: #606b7d; background: #f0f2f5; border-color: #9ba5b4; }
+    .calendar-event.private { color: #4c586b; background: #e6e9ef; border-color: #718096; }
     .calendar-event.availability { color: #23785f; background: #e7f5f0; border-color: #64b99b; }
     .calendar-event.booking { color: #6551a4; background: #f0edff; border-color: #9581df; }
-    .calendar-event.pending { color: #956318; background: #fff3d9; border-color: #e3af4b; border-style: dashed; }
+    .calendar-event.pending { color: transparent; background: #fff3d9; border: 0; border-left: 3px solid #e3af4b; padding: 0; }
+    .calendar-event.pending strong, .calendar-event.pending span { display: none; }
     .calendar-event.public-view { cursor: pointer; }
     .calendar-event.public-view:hover { box-shadow: 0 2px 8px rgba(32,131,106,.15); }
     .now-line { height: 2px; background: #eb6c6c; position: absolute; z-index: 2; left: 0; right: 0; pointer-events: none; }
@@ -141,6 +147,7 @@
     .legend-swatch.private { background: #a5adba; }
     .legend-swatch.available { background: #6bb99c; }
     .legend-swatch.booking { background: #9a89d8; }
+    .legend-swatch.pending { background: #e3af4b; }
     .request-page { display: none; flex: 1; min-height: 0; overflow-y: auto; }
     .request-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 4px 0 17px; padding: 18px 20px; border: 1px solid #f1e4c8; background: #fffaf0; border-radius: 11px; }
     .request-summary h2 { font-size: 13px; margin: 0; color: #574827; }
@@ -151,12 +158,15 @@
     .section-heading span { color: #929baa; font-size: 10px; }
     .request-list { display: grid; gap: 10px; }
     .request-card { background: white; border: 1px solid var(--line); border-radius: 11px; padding: 16px; display: grid; grid-template-columns: 38px minmax(0,1fr) auto; gap: 13px; align-items: start; }
-    .request-card .avatar { width: 38px; height: 38px; font-size: 12px; background: #f1e6eb; color: #784257; }
+    .request-card .avatar { position: relative; width: 38px; height: 38px; overflow: hidden; border-radius: 8px; font-size: 12px; background: #f1e6eb; color: #784257; display: grid; place-items: center; }
+    .request-card .avatar-gif { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     .request-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .request-meta strong { font-size: 12px; color: #37445d; }
     .status-pill { color: #9c6c18; background: #fff2d7; padding: 3px 7px; border-radius: 20px; font-size: 8px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
     .request-time { margin-top: 8px; color: #57647b; font-size: 10px; font-weight: 600; }
     .request-note { margin: 7px 0 0; color: #8590a0; font-size: 10px; line-height: 1.5; }
+    .request-visibility { display: grid; gap: 5px; margin-top: 11px; max-width: 280px; color: #758197; font-size: 9px; font-weight: 650; }
+    .request-visibility select { width: 100%; min-height: 31px; padding: 5px 8px; border: 1px solid #e0e5ed; border-radius: 7px; color: #526078; background: #fff; font: inherit; font-weight: 550; }
     .request-actions { display: flex; gap: 7px; align-self: center; }
     .request-actions .button { height: 31px; padding: 0 10px; font-size: 9px; }
     .request-actions .button.primary { background: #28846b; border-color: #28846b; box-shadow: none; }
@@ -242,6 +252,8 @@
     .type-option strong svg { width: 13px; height: 13px; }
     .type-option span { display: block; color: #9099a8; font-size: 8px; margin-top: 5px; line-height: 1.4; font-weight: 450; }
     .type-option input:checked + label { border-color: #d29aab; background: #fcf6f8; box-shadow: 0 0 0 2px rgba(141,41,71,.08); }
+    .availability-switch { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 9px 0 0; padding: 9px 10px; border: 1px solid #eee5e9; border-radius: 8px; color: #7f899a; background: #fcfafb; font-size: 9px; }
+    .availability-switch .button { height: 30px; padding: 0 10px; font-size: 9px; }
     .visibility-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .visibility-option { position: relative; }
     .visibility-option input { position: absolute; opacity: 0; pointer-events: none; }
@@ -254,8 +266,9 @@
     .modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 19px; gap: 8px; }
     .modal-actions .right-actions { display: flex; gap: 8px; margin-left: auto; }
     .modal-actions .button { height: 35px; font-size: 10px; }
-    .modal-error { display: none; color: #ad4747; font-size: 9px; margin: 10px 0 0; }
-    .modal-error.show { display: block; }
+    .modal-error { display: none; align-items: center; gap: 8px; color: #7d2944; font-size: 10px; line-height: 1.45; margin: 12px 0 0; padding: 9px 11px; border: 1px solid #efd9e0; border-radius: 8px; background: #fff8fa; }
+    .modal-error::before { content: '!'; display: inline-grid; place-items: center; width: 16px; height: 16px; flex: none; border-radius: 50%; color: #8d2947; background: #f5e5eb; font-size: 10px; font-weight: 800; }
+    .modal-error.show { display: flex; }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
     }
@@ -336,9 +349,7 @@
           <div class="heading-actions" style="display:none">
             <div class="week-summary" id="week-summary" aria-label="This week's summary"><span class="week-summary-label">This week</span><span><strong id="stat-slots">0</strong> slots</span><span class="week-summary-divider" aria-hidden="true"></span><span><strong id="stat-open">0</strong> open for booking</span></div>
             <button class="button primary" id="guest-request" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16M12 12v5m-2.5-2.5h5"/></svg>Request a time</button>
-            <button class="button" id="preview-button" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page</button>
             <button class="button primary" id="add-slot" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14"/></svg>Add time slot</button>
-            <button class="button" id="open-booking-slot" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Open for booking</button>
           </div>
         </div>
 
@@ -376,12 +387,13 @@
   <div class="modal-backdrop" id="slot-modal-backdrop" role="presentation">
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="slot-modal-title">
       <div class="modal-head"><div><h2 id="slot-modal-title">Add time slot</h2><p id="slot-modal-copy">Add personal time or a meeting with others to your timetable.</p></div><button class="close-button" data-close="slot-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
-      <form id="slot-form">
+      <form id="slot-form" novalidate>
         <input type="hidden" id="slot-kind" name="kind" value="event" />
         <div class="field full" id="slot-type-field" style="margin-bottom:13px"><label>Slot type</label><div class="type-options">
           <div class="type-option"><input type="radio" name="eventType" value="personal" id="event-type-personal" checked><label for="event-type-personal"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M8 3v4m8-4v4M4 10h16"/></svg>Personal time</strong><span>Activities just for you, such as badminton or guitar.</span></label></div>
           <div class="type-option"><input type="radio" name="eventType" value="meeting" id="event-type-meeting"><label for="event-type-meeting"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3.5 20c.2-3.6 2.1-5.4 5.5-5.4s5.3 1.8 5.5 5.4m.4-5c3.1-.3 5.1 1.4 5.6 4.6"/></svg>Meeting with others</strong><span>Plans with friends or other people.</span></label></div>
         </div></div>
+        <div class="availability-switch" id="availability-switch"><span id="availability-switch-copy">Want people to request this time?</span><button class="button" type="button" id="toggle-slot-mode">Open for booking</button></div>
         <div class="form-grid">
           <div class="field full" id="slot-title-field"><label id="slot-name-label" for="slot-title">Activity name</label><input id="slot-title" name="title" maxlength="60" placeholder="e.g. Badminton" required /></div>
           <div class="field full"><label for="slot-date-picker-button">Date</label><div class="picker-control date-picker" id="slot-date-picker" data-date-picker data-input="slot-date"><input type="hidden" id="slot-date" name="date" /><button class="picker-trigger" id="slot-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div>
@@ -393,7 +405,7 @@
             <div class="visibility-option"><input type="radio" name="visibility" value="private" id="visibility-private"><label for="visibility-private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg><span><strong>Private</strong><span>Others only see unavailable</span></span></label></div>
           </div><p class="privacy-help">Open booking times are visible to visitors. Personal time blocks prevent overlapping requests.</p></div>
         </div>
-        <p class="modal-error" id="slot-error"></p>
+        <p class="modal-error" id="slot-error" role="alert" aria-live="polite"></p>
         <div class="modal-actions"><button class="button danger" type="button" id="delete-slot" hidden>Delete slot</button><div class="right-actions"><button class="button" type="button" data-close="slot-modal-backdrop">Cancel</button><button class="button primary" type="submit" id="save-slot">Save slot</button></div></div>
       </form>
     </section>
@@ -402,10 +414,10 @@
   <div class="modal-backdrop" id="booking-modal-backdrop" role="presentation">
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
       <div class="modal-head"><div><h2 id="booking-modal-title">Request this time</h2><p id="booking-slot-copy">No account needed. Add your name, phone, and a short message; email is optional.</p></div><button class="close-button" data-close="booking-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
-      <form id="booking-form"><input type="hidden" name="slotId" id="booking-slot-id" />
+      <form id="booking-form" novalidate><input type="hidden" name="slotId" id="booking-slot-id" />
         <div class="form-grid" id="booking-time-fields" style="display:none"><div class="field full"><label for="booking-date-picker-button">Requested date</label><div class="picker-control date-picker" id="booking-date-picker" data-date-picker data-input="booking-date"><input type="hidden" id="booking-date" name="requestDate" /><button class="picker-trigger" id="booking-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-start-picker-button">Starts</label><div class="picker-control time-picker" id="booking-start-picker" data-time-picker data-input="booking-start" data-end="false"><input type="hidden" id="booking-start" name="requestStart" /><button class="picker-trigger" id="booking-start-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-end-picker-button">Ends</label><div class="picker-control time-picker" id="booking-end-picker" data-time-picker data-input="booking-end" data-end="true"><input type="hidden" id="booking-end" name="requestEnd" /><button class="picker-trigger" id="booking-end-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div><p class="picker-range-preview field full" id="booking-range-preview" role="status" aria-live="polite"></p></div>
         <div class="form-grid" style="margin-top:13px"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required /></div><div class="field full"><label for="booker-phone">Your phone</label><input id="booker-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" minlength="7" maxlength="32" required /></div><div class="field full"><label for="booker-email">Email <span class="optional-label">(optional)</span></label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">Short message</label><textarea id="booking-note" name="note" maxlength="300" required placeholder="What would you like to discuss? (up to 300 characters)"></textarea></div></div>
-        <p class="modal-error" id="booking-error"></p><div class="modal-actions"><span></span><div class="right-actions"><button class="button" type="button" data-close="booking-modal-backdrop">Cancel</button><button class="button primary" type="submit">Send request</button></div></div>
+        <p class="modal-error" id="booking-error" role="alert" aria-live="polite"></p><div class="modal-actions"><span></span><div class="right-actions"><button class="button" type="button" data-close="booking-modal-backdrop">Cancel</button><button class="button primary" type="submit">Send request</button></div></div>
       </form>
     </section>
   </div>
@@ -414,7 +426,7 @@
   <script src="./supabase-config.js"></script>
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-    import { DAY_START_MINUTE, DAY_END_MINUTE, canNavigateToPreviousWeek, draggedMinuteRange, formatScheduleTimestamp, isPastDate, monthCalendarDates, nextRequestWindow, normalizeSlotEventType, rangesOverlap, resolveSlotSelection, timeMinutes, timePickerHours, timePickerMinutes, validateRequestContact, validateTimeRange } from './timetable-rules.mjs?v=owner-event-types-1';
+    import { DAY_START_MINUTE, DAY_END_MINUTE, canNavigateToPreviousWeek, draggedMinuteRange, eventDisplayMetrics, formatScheduleTimestamp, isPastDate, monthCalendarDates, nextRequestWindow, normalizeSlotEventType, rangesOverlap, resolveSlotSelection, timeMinutes, timePickerHours, timePickerMinutes, validateRequestContact, validateTimeRange } from './timetable-rules.mjs?v=requestable-free-time-2';
     (() => {
       const PX_PER_MINUTE = 32 / 30;
       const HCMC_TIMESTAMP = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
@@ -459,14 +471,14 @@
       const dbTime = value => String(value || '').slice(0, 5);
       const slotFromRow = row => ({ id: row.id, kind: row.kind, eventType: normalizeSlotEventType(row.kind, row.event_type), title: row.title, date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility });
       const slotToRow = slot => ({ id: slot.id, kind: slot.kind, event_type: normalizeSlotEventType(slot.kind, slot.eventType), title: slot.title, slot_date: slot.date, start_time: slot.start, end_time: slot.end, visibility: slot.visibility });
-      const requestFromRow = row => ({ id: row.id, slotId: row.slot_id, availabilityTitle: row.availability_title, name: row.name, phone: row.phone || '', email: row.email || '', note: row.note || '', date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), status: row.status, createdAt: row.created_at });
+      const requestFromRow = row => ({ id: row.id, slotId: row.slot_id, availabilityTitle: row.availability_title, name: row.name, phone: row.phone || '', email: row.email || '', note: row.note || '', date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), status: row.status, visibility: row.visibility === 'public' ? 'public' : 'private', createdAt: row.created_at });
       const save = async () => {
         if (!supabase || !ownerAuthenticated || !ownerView) return false;
         const slots = state.slots.map(slotToRow);
         const removedSlots = [...persistedSlotIds].filter(id => !state.slots.some(slot => slot.id === id));
         try {
           if (slots.length) { const { error } = await supabase.from('timetable_slots').upsert(slots); if (error) throw error; }
-          const requestUpdates = await Promise.all(state.requests.map(request => supabase.from('booking_requests').update({ status: request.status }).eq('id', request.id)));
+          const requestUpdates = await Promise.all(state.requests.map(request => supabase.from('booking_requests').update({ status: request.status, visibility: request.visibility === 'public' ? 'public' : 'private' }).eq('id', request.id)));
           const requestError = requestUpdates.find(result => result.error)?.error;
           if (requestError) throw requestError;
           if (removedSlots.length) { const { error } = await supabase.from('timetable_slots').delete().in('id', removedSlots); if (error) throw error; }
@@ -723,7 +735,9 @@
       function eventText(item) {
         if (visitorMode) {
           if (item.kind === 'availability') return isPastSlot(item.date, item.start) ? { title: 'Unavailable', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` } : { title: 'Available to book', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
-          if (item.kind === 'booking') return { title: 'Booked', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
+          if (item.kind === 'booking') return item.visibility === 'public'
+            ? { title: item.title || item.name || 'Booked', sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Booked` }
+            : { title: 'Unavailable', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
           if (item.kind === 'pending') return { title: 'Unavailable', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
           if (item.visibility === 'private') return { title: 'Unavailable', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
           return { title: item.title, sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
@@ -740,7 +754,9 @@
         if (visitorMode && week < currentWeek) week = currentWeek;
         updateWeekTitle();
         const dates = weekDates();
-        const todayKey = dateKey(new Date());
+        const currentParts = Object.fromEntries(HCMC_CLOCK.formatToParts(new Date()).map(part => [part.type, part.value]));
+        const todayKey = `${currentParts.year}-${currentParts.month}-${currentParts.day}`;
+        const requestableCalendar = visitorMode && Boolean(supabase);
         $('#prev-week').hidden = !canNavigateToPreviousWeek(dateKey(week), dateKey(currentWeek), visitorMode);
         $('#day-head').innerHTML = `<div class="day-head-spacer"></div>` + dates.map(date => {
           const key = dateKey(date), today = key === todayKey, past = isPastDate(key, todayKey);
@@ -754,26 +770,35 @@
         body += '</div>';
         dates.forEach(date => {
           const key = dateKey(date), today = key === todayKey, past = isPastDate(key, todayKey);
+          const dayItems = itemEventsForDay(key);
           body += `<div class="day-column ${today ? 'today-column' : ''} ${past ? 'past-day' : ''}" data-date="${key}" ${past ? 'title="Past day"' : ''}>`;
-          for (const item of itemEventsForDay(key)) {
+          for (const item of dayItems) {
             const start = timeMinutes(item.start), end = slotEnd(item);
             if (end <= DAY_START_MINUTE || start >= DAY_END_MINUTE) continue;
             const top = Math.max(0, (start - DAY_START_MINUTE) * PX_PER_MINUTE);
-            const height = Math.max(31, Math.min(DAY_END_MINUTE, end) - Math.max(DAY_START_MINUTE, start)) * PX_PER_MINUTE;
-            const styleHeight = Math.max(31, height);
+            const duration = Math.max(0, Math.min(DAY_END_MINUTE, end) - Math.max(DAY_START_MINUTE, start));
+            const metrics = eventDisplayMetrics(duration, PX_PER_MINUTE);
+            const styleTop = top + metrics.topInset;
+            const styleHeight = metrics.renderedHeight;
             const info = eventText(item);
             const available = item.kind === 'availability';
             const clickable = visitorMode && !ownerView && available && !isPastSlot(item.date, item.start);
             let extra = '';
             if (!visitorMode && item.kind === 'event' && item.visibility === 'private') extra = 'private';
             else if (item.itemType === 'public') extra = 'public';
-            else if (item.itemType === 'availability') extra = 'availability';
+            else if (item.itemType === 'availability' && (!visitorMode || !isPastSlot(item.date, item.start))) extra = 'availability';
+            else if (visitorMode && item.kind === 'availability') extra = 'private';
+            else if (visitorMode && item.kind === 'booking' && item.visibility !== 'public') extra = 'private';
             else if (item.kind === 'booking') extra = 'booking';
             else if (item.kind === 'pending') extra = 'pending';
             else if (visitorMode && item.visibility === 'private') extra = 'private';
             const editable = !visitorMode && (item.kind === 'event' || item.kind === 'availability');
             const dataAttrs = clickable ? `data-book="${item.id}"` : (editable ? `data-edit="${item.id}"` : item.kind === 'pending' && !visitorMode ? 'data-open-requests="true"' : '');
-            body += `<article class="calendar-event ${extra} ${clickable ? 'public-view' : ''}" style="top:${top}px;height:${styleHeight}px" ${dataAttrs} tabindex="${clickable || editable || item.kind === 'pending' && !visitorMode ? '0' : '-1'}" aria-label="${escapeHtml(info.title)}, ${escapeHtml(info.sub)}"><strong>${escapeHtml(info.title)}</strong><span>${escapeHtml(info.sub)}</span></article>`;
+            const compactClass = metrics.compact ? 'compact' : metrics.short ? 'short' : '';
+            const pendingOwnerEvent = item.kind === 'pending' && !visitorMode;
+            const eventTitle = pendingOwnerEvent ? 'Pending request · Select to review' : `${info.title} · ${info.sub}`;
+            const eventLabel = pendingOwnerEvent ? 'Pending request. Select to review.' : `${info.title}, ${info.sub}`;
+            body += `<article class="calendar-event ${extra} ${compactClass} ${clickable ? 'public-view' : ''}" style="top:${styleTop}px;height:${styleHeight}px" ${dataAttrs} tabindex="${clickable || editable || item.kind === 'pending' && !visitorMode ? '0' : '-1'}" title="${escapeHtml(eventTitle)}" aria-label="${escapeHtml(eventLabel)}"><strong>${escapeHtml(info.title)}</strong><span>${escapeHtml(info.sub)}</span></article>`;
           }
           const now = new Date();
           if (key === todayKey) {
@@ -783,12 +808,12 @@
           body += '</div>';
         });
         $('#calendar-body').style.height = `${(DAY_END_MINUTE - DAY_START_MINUTE) * PX_PER_MINUTE}px`;
-        $('#calendar-body').classList.toggle('requestable', visitorMode && !ownerView && Boolean(supabase));
+        $('#calendar-body').classList.toggle('requestable', requestableCalendar && !ownerView);
         $('#calendar-body').innerHTML = body;
         const weekSlots = state.slots.filter(slot => dates.some(d => dateKey(d) === slot.date) && !(slot.kind === 'availability' && state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))));
         $('#stat-slots').textContent = String(weekSlots.length + state.requests.filter(r => r.status === 'accepted' && dates.some(d => dateKey(d) === r.date)).length);
         $('#stat-open').textContent = String(state.slots.filter(slot => slot.kind === 'availability' && dates.some(d => dateKey(d) === slot.date) && !state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))).length);
-        $('#legend').innerHTML = visitorMode ? '<span class="legend-item"><i class="legend-swatch available"></i>Available to request</span><span class="legend-item"><i class="legend-swatch private"></i>Unavailable</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>' : '<span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>';
+        $('#legend').innerHTML = visitorMode ? '<span class="legend-item"><i class="legend-swatch private"></i>Unavailable</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span><span class="legend-item"><i class="legend-swatch pending"></i>Pending request</span>' : '<span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span><span class="legend-item"><i class="legend-swatch pending"></i>Pending request</span>';
         updateRequestCounts();
       }
       const minuteToClock = minute => `${String(Math.floor(minute / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`;
@@ -836,12 +861,24 @@
         $('#requests-summary-copy').textContent = count ? 'Accept a request to add it to your timetable, or decline if the time doesn’t work.' : 'When someone requests an open time, it will appear here for you to review.';
       }
       function initials(name) { return String(name || '?').trim().split(/\s+/).slice(0,2).map(part => part[0]).join('').toUpperCase(); }
+      const doraemonAvatarGifs = [
+        'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXl1aGtnaHF5M20zcjk5Z2c5d2xjeWJ3dDZqaW4wY25xOXV1c2FidiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/DsQORHTBt8sygh7TEI/giphy.gif',
+        'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbG1xOWVsMmJtcXN1NjBxYXBveXZqMTdpaGhja2NvZGFrcWhnanF3NiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/JeD5li4yaaL3mlctle/giphy.gif',
+        'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3lva24xMW03ZWNrOTdiYXYzbW5mcng0Z21jbTRlenVweHcwNWczcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MZJKGjuo8FJWvWKv2X/giphy.gif'
+      ];
+      function requestAvatarGif(requestId) {
+        let hash = 2166136261;
+        for (const character of String(requestId || '')) hash = Math.imul(hash ^ character.charCodeAt(0), 16777619);
+        return doraemonAvatarGifs[(hash >>> 0) % doraemonAvatarGifs.length];
+      }
       function requestCard(request, confirmed = false) {
         const status = confirmed ? '<span class="status-pill" style="color:#36816d;background:#e8f6f1">Confirmed</span>' : '<span class="status-pill">Awaiting response</span>';
         const actions = confirmed ? `<div class="request-actions"><button class="button danger" data-cancel-booking="${request.id}">Cancel booking</button></div>` : `<div class="request-actions"><button class="button" data-decline="${request.id}">Decline</button><button class="button primary" data-accept="${request.id}">Accept</button></div>`;
         const contact = `<p class="request-note">Phone: ${escapeHtml(request.phone || 'Not provided')}</p>${request.email ? `<p class="request-note">Email: ${escapeHtml(request.email)}</p>` : ''}`;
         const note = request.note ? `<p class="request-note">“${escapeHtml(request.note)}”</p>` : '';
-        return `<article class="request-card"><div class="avatar">${escapeHtml(initials(request.name))}</div><div><div class="request-meta"><strong>${escapeHtml(request.name)}</strong>${status}</div><div class="request-time">${escapeHtml(timestampRange(request.date, request.start, request.end))}</div>${contact}${note}</div>${actions}</article>`;
+        const visibility = request.visibility === 'public' ? 'public' : 'private';
+        const visibilityControl = `<label class="request-visibility"><span>Visitor visibility</span><select data-request-visibility="${request.id}" aria-label="Visitor visibility for ${escapeHtml(request.name)}"><option value="private" ${visibility === 'private' ? 'selected' : ''}>Private · show as Unavailable</option><option value="public" ${visibility === 'public' ? 'selected' : ''}>Public · show name</option></select></label>`;
+        return `<article class="request-card"><div class="avatar"><span aria-hidden="true">${escapeHtml(initials(request.name))}</span><img class="avatar-gif" src="${requestAvatarGif(request.id)}" alt="" aria-hidden="true" loading="lazy" /></div><div><div class="request-meta"><strong>${escapeHtml(request.name)}</strong>${status}</div><div class="request-time">${escapeHtml(timestampRange(request.date, request.start, request.end))}</div>${contact}${note}${visibilityControl}</div>${actions}</article>`;
       }
       function renderRequests() {
         const pending = state.requests.filter(isPending).sort((a,b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start));
@@ -872,8 +909,6 @@
         $('#header-nav').style.display = ownerView ? 'flex' : 'none';
         $('#mode-note').innerHTML = value ? (ownerView ? 'This preview shows the public view' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>Click an available time to request it') : `${icon('lock')}Only you can see private slot names`;
         $('#add-slot').style.display = ownerView && !value ? 'inline-flex' : 'none';
-        $('#open-booking-slot').style.display = ownerView && !value ? 'inline-flex' : 'none';
-        $('#preview-button').style.display = ownerView ? 'inline-flex' : 'none';
         $('.heading-actions').style.display = 'flex';
         $('#week-summary').style.display = ownerView && !value ? 'inline-flex' : 'none';
         $('#nav-requests').style.display = ownerView ? 'flex' : 'none';
@@ -881,16 +916,15 @@
         $('#page-title').textContent = publicVisitor ? 'Book a time' : value ? 'Visitor preview' : 'My timetable';
         $('#page-subtitle').textContent = publicVisitor ? 'Drag across a day to request any future time, or choose a listed opening. No sign-in needed; the owner confirms before it is booked.' : value ? 'This is the public schedule guests see. Private time only appears as unavailable.' : 'Plan your time, set what others can see, and make room for good conversations.';
         $('#guest-request').style.display = publicVisitor ? 'inline-flex' : 'none';
-        $('#preview-button').innerHTML = value ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m19 12-7 7-7-7m7 7V5"/></svg>Back to my view' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page';
         renderCalendar();
         return true;
       }
-      function openSlotModal(slot = null, date = null, mode = 'event') {
+      function openSlotModal(slot = null, date = null) {
         if (visitorMode || !ownerView) return;
         editingSlotId = slot?.id || null;
         closePickers();
         const form = $('#slot-form'); form.reset();
-        const kind = slot?.kind || mode;
+        const kind = slot?.kind || 'event';
         $('#slot-modal-title').textContent = kind === 'availability'
           ? (slot ? 'Edit booking availability' : 'Open time for booking')
           : (slot ? 'Edit time slot' : 'Add time slot');
@@ -917,6 +951,8 @@
         $('#slot-title-field').style.display = availability ? 'none' : 'grid';
         $('#slot-title').required = !availability;
         $('#visibility-field').style.display = availability ? 'none' : 'grid';
+        $('#availability-switch-copy').textContent = availability ? 'Adding your own activity or meeting?' : 'Want people to request this time?';
+        $('#toggle-slot-mode').textContent = availability ? 'Back to time slot' : 'Open for booking';
         $('#slot-name-label').textContent = eventType === 'meeting' ? 'Meeting name' : 'Activity name';
         $('#slot-title').placeholder = eventType === 'meeting' ? 'e.g. Coffee with Mai' : 'e.g. Badminton';
         if (availability) $('#slot-title').value = '';
@@ -944,7 +980,10 @@
         setTimeout(() => $('#booker-name').focus(), 40);
       }
       function closeModal(id) { closePickers(); $(`#${id}`).classList.remove('open'); }
-      function showError(selector, message) { const el = $(selector); el.textContent = message; el.classList.add('show'); }
+      function showError(selector, message, focusTarget = null) {
+        const el = $(selector); el.textContent = message; el.classList.add('show');
+        if (focusTarget) $(focusTarget)?.focus();
+      }
       async function applyAuthSession(session) {
         const sessionKey = session?.user?.id || null;
         if (activeSessionKey === sessionKey) return;
@@ -1035,9 +1074,11 @@
       $('#next-week').addEventListener('click', () => { week.setDate(week.getDate() + 7); renderCalendar(); });
       $('#today-button').addEventListener('click', () => { week = startOfWeek(new Date()); renderCalendar(); });
       $('#add-slot').addEventListener('click', () => openSlotModal());
-      $('#open-booking-slot').addEventListener('click', () => openSlotModal(null, null, 'availability'));
       $('#guest-request').addEventListener('click', () => openBookingModal());
-      $('#preview-button').addEventListener('click', () => setVisitorMode(!visitorMode));
+      $('#toggle-slot-mode').addEventListener('click', () => {
+        $('#slot-kind').value = $('#slot-kind').value === 'availability' ? 'event' : 'availability';
+        updateSlotFormKind();
+      });
       $('#owner-mode').addEventListener('click', () => setVisitorMode(false));
       $('#visitor-mode').addEventListener('click', () => setVisitorMode(true));
       $('#auth-button').addEventListener('click', async () => {
@@ -1143,7 +1184,9 @@
         const { kind, eventType } = selection;
         const slot = { id: editingSlotId || uid(), kind, eventType, title: kind === 'availability' ? 'Open for booking' : String(form.get('title')).trim(), date: form.get('date'), start: form.get('start'), end: form.get('end'), visibility: kind === 'availability' ? 'public' : form.get('visibility') };
         const error = $('#slot-error'); error.classList.remove('show');
-        if (!slot.date || !validateTimeRange(slot.start, slot.end)) { showError('#slot-error', 'Choose a valid time range within the day.'); return; }
+        if (!slot.date) { showError('#slot-error', 'Choose a date for this time slot.', '#slot-date-picker-button'); return; }
+        if (!validateTimeRange(slot.start, slot.end)) { showError('#slot-error', 'Choose an end time after the start time.', '#slot-start-picker-button'); return; }
+        if (kind === 'event' && !slot.title) { showError('#slot-error', 'Add a short name for this time slot.', '#slot-title'); return; }
         if (kind === 'availability' && isPastSlot(slot.date, slot.start)) { showError('#slot-error', 'Booking availability must start in the future.'); return; }
         if (overlapping(slot.date, slot.start, slot.end, editingSlotId)) { showError('#slot-error', 'This time overlaps another slot or booking. Choose a different time.'); return; }
         if (editingSlotId) state.slots = state.slots.map(item => item.id === editingSlotId ? slot : item);
@@ -1163,7 +1206,12 @@
         event.preventDefault();
         const form = new FormData(event.currentTarget);
         const contact = validateRequestContact({ name: form.get('name'), phone: form.get('phone'), email: form.get('email'), note: form.get('note') });
-        if (!contact.valid) { showError('#booking-error', contact.error); return; }
+        if (!contact.valid) {
+          const focusTarget = contact.error.startsWith('Enter your name') ? '#booker-name'
+            : contact.error.startsWith('Enter a valid phone') ? '#booker-phone'
+            : contact.error.startsWith('Enter a valid email') ? '#booker-email' : '#booking-note';
+          showError('#booking-error', contact.error, focusTarget); return;
+        }
         const { name, phone, email, note } = contact.value;
         const slotId = String(form.get('slotId') || '');
         let rpcName, rpcArgs, date, start, end;
@@ -1189,6 +1237,26 @@
         if (error) { showError('#booking-error', 'That time is no longer available. Refresh and choose a different time.'); await loadPublicSchedule(); return; }
         closeModal('booking-modal-backdrop'); await loadPublicSchedule(); toast('Request sent — waiting for approval');
       });
+
+      document.addEventListener('change', async event => {
+        const select = event.target.closest('[data-request-visibility]');
+        if (!select) return;
+        const request = state.requests.find(item => item.id === select.dataset.requestVisibility);
+        if (!request) return;
+        request.visibility = select.value === 'public' ? 'public' : 'private';
+        const { error } = await supabase.from('booking_requests').update({ visibility: request.visibility }).eq('id', request.id);
+        if (error) {
+          console.error('Booking visibility update failed', error);
+          toast('Could not update visitor visibility. Please try again.');
+          await loadOwnerData();
+          return;
+        }
+        renderRequests(); renderCalendar();
+        toast(`Meeting set to ${request.visibility}`);
+      });
+      document.addEventListener('error', event => {
+        if (event.target.matches?.('.avatar-gif')) event.target.hidden = true;
+      }, true);
 
       document.addEventListener('click', async event => {
         const accept = event.target.closest('[data-accept]');
