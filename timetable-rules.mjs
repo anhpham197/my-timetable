@@ -15,6 +15,25 @@ export function isPastDate(dateKey, todayKey) {
   return String(dateKey) < String(todayKey);
 }
 
+export function canNavigateToPreviousWeek(weekStartKey, currentWeekStartKey, visitorMode) {
+  return !visitorMode || String(weekStartKey) > String(currentWeekStartKey);
+}
+
+export function resolveSlotSelection(selection) {
+  if (selection === 'personal' || selection === 'meeting') {
+    return { kind: 'event', eventType: selection };
+  }
+  if (selection === 'availability') {
+    return { kind: 'availability', eventType: null };
+  }
+  return null;
+}
+
+export function normalizeSlotEventType(kind, eventType) {
+  if (kind !== 'event') return null;
+  return eventType === 'meeting' ? 'meeting' : 'personal';
+}
+
 export function validateTimeRange(start, end) {
   const startMinute = timeMinutes(start);
   const endMinute = timeMinutes(end);

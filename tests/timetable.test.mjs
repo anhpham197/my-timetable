@@ -4,12 +4,15 @@ import assert from 'node:assert/strict';
 import {
   DAY_END_MINUTE,
   DAY_START_MINUTE,
+  canNavigateToPreviousWeek,
   draggedMinuteRange,
   formatScheduleTimestamp,
   isPastDate,
   monthCalendarDates,
   nextRequestWindow,
+  normalizeSlotEventType,
   rangesOverlap,
+  resolveSlotSelection,
   timeMinutes,
   timePickerHours,
   timePickerMinutes,
@@ -30,6 +33,26 @@ test('only dates before today are marked as past', () => {
   assert.equal(isPastDate('2026-11-20', '2026-11-21'), true);
   assert.equal(isPastDate('2026-11-21', '2026-11-21'), false);
   assert.equal(isPastDate('2026-11-22', '2026-11-21'), false);
+});
+
+test('visitor navigation stops at the current week while owners can browse earlier weeks', () => {
+  assert.equal(canNavigateToPreviousWeek('2026-11-16', '2026-11-16', true), false);
+  assert.equal(canNavigateToPreviousWeek('2026-11-23', '2026-11-16', true), true);
+  assert.equal(canNavigateToPreviousWeek('2026-11-09', '2026-11-16', false), true);
+});
+
+test('owner event types are distinct from bookable guest availability', () => {
+  assert.deepEqual(resolveSlotSelection('personal'), { kind: 'event', eventType: 'personal' });
+  assert.deepEqual(resolveSlotSelection('meeting'), { kind: 'event', eventType: 'meeting' });
+  assert.deepEqual(resolveSlotSelection('availability'), { kind: 'availability', eventType: null });
+  assert.equal(resolveSlotSelection('unknown'), null);
+});
+
+test('event type persistence keeps legacy events personal and excludes availability', () => {
+  assert.equal(normalizeSlotEventType('event', 'meeting'), 'meeting');
+  assert.equal(normalizeSlotEventType('event', 'personal'), 'personal');
+  assert.equal(normalizeSlotEventType('event', null), 'personal');
+  assert.equal(normalizeSlotEventType('availability', 'meeting'), null);
 });
 
 test('time ranges reject invalid clocks, empty durations, and 24:00 starts', () => {

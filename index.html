@@ -65,6 +65,10 @@
     h1 { font-size: 27px; line-height: 1.15; letter-spacing: -.04em; margin: 0; font-weight: 700; color: #202b3e; }
     .subtitle { font-size: 12px; color: #7f899a; margin: 8px 0 0; }
     .heading-actions { display: flex; align-items: center; gap: 9px; }
+    .week-summary { display: none; align-items: center; gap: 9px; margin-right: 3px; color: #7e899a; font-size: 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .week-summary strong { color: #46536b; font-weight: 750; }
+    .week-summary-label { color: #8c96a7; }
+    .week-summary-divider { width: 1px; height: 14px; background: #e7eaf0; }
     .button { border: 1px solid #e0e5ed; background: white; color: #526078; height: 38px; padding: 0 13px; border-radius: 8px; font-size: 11px; font-weight: 650; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease; white-space: nowrap; }
     .button:hover { background: #f8f9fc; border-color: #cfd6e2; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(62,27,44,.07); }
     .button svg { width: 15px; height: 15px; }
@@ -80,13 +84,14 @@
     .mode-note { display: flex; align-items: center; gap: 6px; color: #8791a2; font-size: 10px; }
     .mode-note svg { width: 13px; height: 13px; color: #b66580; }
     #calendar-page { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-    #calendar-page > .page-heading, #calendar-page > .modebar, #calendar-page > .visitor-banner, #calendar-page > .connection-banner, #calendar-page > .below-grid, #calendar-page > .empty-banner { flex: none; }
+    #calendar-page > .page-heading, #calendar-page > .modebar, #calendar-page > .visitor-banner, #calendar-page > .connection-banner { flex: none; }
     .calendar-card { border: 1px solid #e6e9ef; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 4px 14px rgba(34,46,70,.025); transition: box-shadow .25s ease, border-color .25s ease; animation: soft-reveal .5s .1s cubic-bezier(.2,.7,.25,1) both; flex: 1; min-height: 180px; display: flex; flex-direction: column; }
     .calendar-card:hover { border-color: #e1d7dc; box-shadow: 0 9px 28px rgba(62,27,44,.06); }
     .calendar-toolbar { padding: 13px 16px; min-height: 57px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .week-nav { display: flex; align-items: center; gap: 8px; }
     .week-title { min-width: 164px; font-size: 12px; font-weight: 650; color: #3d4960; }
     .arrow-button { width: 27px; height: 27px; background: white; border: 1px solid var(--line); color: #7b8798; display: grid; place-items: center; border-radius: 7px; }
+    .arrow-button[hidden] { display: none; }
     .arrow-button:hover { color: var(--blue); border-color: #e7c1cb; }
     .arrow-button svg { width: 13px; height: 13px; }
     .toolbar-right { display: flex; align-items: center; gap: 10px; }
@@ -136,20 +141,6 @@
     .legend-swatch.private { background: #a5adba; }
     .legend-swatch.available { background: #6bb99c; }
     .legend-swatch.booking { background: #9a89d8; }
-    .below-grid { display: grid; grid-template-columns: minmax(0,1fr) 270px; gap: 16px; margin-top: 16px; animation: soft-reveal .45s .16s cubic-bezier(.2,.7,.25,1) both; }
-    .info-card { background: white; border: 1px solid var(--line); border-radius: 11px; padding: 16px; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-    .info-card:hover { transform: translateY(-2px); border-color: #e5d7dd; box-shadow: 0 8px 20px rgba(62,27,44,.055); }
-    .info-card h2 { font-size: 12px; margin: 0; color: #3c4960; }
-    .info-card p { color: #8791a1; line-height: 1.55; font-size: 10px; margin: 7px 0 0; }
-    .privacy-row { display: flex; align-items: flex-start; gap: 10px; }
-    .privacy-icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: #9c4561; background: #f8edf1; flex: none; }
-    .privacy-icon svg { width: 14px; height: 14px; }
-    .privacy-row h2 { margin-top: 1px; }
-    .privacy-row p { margin-top: 5px; }
-    .week-stat { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; margin-top: 11px; border-top: 1px solid #f0f1f5; }
-    .week-stat span { font-size: 10px; color: #8a94a4; }
-    .week-stat strong { font-size: 11px; color: #3d4960; }
-    .empty-banner { margin: 12px 0 0; padding: 11px 13px; border: 1px dashed #dce2ed; color: #748096; border-radius: 8px; font-size: 10px; line-height: 1.5; background: #fbfcfe; }
     .request-page { display: none; flex: 1; min-height: 0; overflow-y: auto; }
     .request-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 4px 0 17px; padding: 18px 20px; border: 1px solid #f1e4c8; background: #fffaf0; border-radius: 11px; }
     .request-summary h2 { font-size: 13px; margin: 0; color: #574827; }
@@ -271,7 +262,6 @@
     @media (max-width: 1000px) {
       .main { padding: 0 22px 8px; }
       .topbar { margin-bottom: 15px; }
-      .below-grid { grid-template-columns: 1fr; }
       .topbar { gap: 12px; }
       .topbar-right { gap: 8px; }
       .timezone { display: none; }
@@ -307,8 +297,6 @@
     @media (max-height: 720px) {
       .topbar { min-height: 62px; margin-bottom: 12px; }
       .page-heading { margin-bottom: 10px; }
-      .below-grid { display: none !important; }
-      .empty-banner { margin-top: 7px; padding: 7px 10px; }
       .calendar-card { min-height: 120px; }
       .calendar-footer { padding: 7px 12px; }
     }
@@ -344,8 +332,14 @@
 
       <section id="calendar-page">
         <div class="page-heading">
-          <div><p class="eyebrow" id="page-eyebrow">Book a meeting</p><h1 id="page-title">Book a time</h1><p class="subtitle" id="page-subtitle">Choose an open time and send a request. The owner will confirm before it is booked.</p></div>
-          <div class="heading-actions" style="display:none"><button class="button primary" id="guest-request" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16M12 12v5m-2.5-2.5h5"/></svg>Request a time</button><button class="button" id="preview-button" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page</button><button class="button primary" id="add-slot" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14"/></svg>Add time slot</button></div>
+          <div><h1 id="page-title">Book a time</h1><p class="subtitle" id="page-subtitle">Choose an open time and send a request. The owner will confirm before it is booked.</p></div>
+          <div class="heading-actions" style="display:none">
+            <div class="week-summary" id="week-summary" aria-label="This week's summary"><span class="week-summary-label">This week</span><span><strong id="stat-slots">0</strong> slots</span><span class="week-summary-divider" aria-hidden="true"></span><span><strong id="stat-open">0</strong> open for booking</span></div>
+            <button class="button primary" id="guest-request" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16M12 12v5m-2.5-2.5h5"/></svg>Request a time</button>
+            <button class="button" id="preview-button" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page</button>
+            <button class="button primary" id="add-slot" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14"/></svg>Add time slot</button>
+            <button class="button" id="open-booking-slot" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Open for booking</button>
+          </div>
         </div>
 
         <div class="modebar" id="modebar" style="display:none">
@@ -366,11 +360,6 @@
           <div class="calendar-scroll" tabindex="0" role="region" aria-label="Full-day weekly calendar. Scroll to view more hours and days."><div class="calendar-min-width"><div class="day-head" id="day-head"></div><div class="calendar-body" id="calendar-body"></div></div></div>
           <div class="calendar-footer"><div class="legend" id="legend"><span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span></div><span>Times shown in GMT+7</span></div>
         </div>
-        <div class="below-grid">
-          <div class="info-card"><div class="privacy-row"><div class="privacy-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 8 3v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></svg></div><div><h2>Your privacy stays in your hands</h2><p>Choose visibility for each personal time slot. Private slots only show others that you're unavailable; the name and details stay yours.</p></div></div></div>
-          <div class="info-card"><h2>This week</h2><div class="week-stat"><span>Time slots</span><strong id="stat-slots">0</strong></div><div class="week-stat"><span>Open for booking</span><strong id="stat-open">0</strong></div></div>
-        </div>
-        <div class="empty-banner" id="empty-banner" hidden>Your timetable is clear. Add a personal event or create an open time for people to request.</div>
       </section>
 
       <section class="request-page" id="requests-page">
@@ -386,14 +375,15 @@
 
   <div class="modal-backdrop" id="slot-modal-backdrop" role="presentation">
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="slot-modal-title">
-      <div class="modal-head"><div><h2 id="slot-modal-title">Add time slot</h2><p>Choose what this time means and who can see the details.</p></div><button class="close-button" data-close="slot-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
+      <div class="modal-head"><div><h2 id="slot-modal-title">Add time slot</h2><p id="slot-modal-copy">Add personal time or a meeting with others to your timetable.</p></div><button class="close-button" data-close="slot-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
       <form id="slot-form">
-        <div class="field full" style="margin-bottom:13px"><label>Slot type</label><div class="type-options">
-          <div class="type-option"><input type="radio" name="kind" value="event" id="kind-event" checked><label for="kind-event"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M8 3v4m8-4v4M4 10h16"/></svg>Personal time</strong><span>Add an event or block on your timetable.</span></label></div>
-          <div class="type-option"><input type="radio" name="kind" value="availability" id="kind-availability"><label for="kind-availability"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Open for booking</strong><span>Let someone request this time with you.</span></label></div>
+        <input type="hidden" id="slot-kind" name="kind" value="event" />
+        <div class="field full" id="slot-type-field" style="margin-bottom:13px"><label>Slot type</label><div class="type-options">
+          <div class="type-option"><input type="radio" name="eventType" value="personal" id="event-type-personal" checked><label for="event-type-personal"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M8 3v4m8-4v4M4 10h16"/></svg>Personal time</strong><span>Activities just for you, such as badminton or guitar.</span></label></div>
+          <div class="type-option"><input type="radio" name="eventType" value="meeting" id="event-type-meeting"><label for="event-type-meeting"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3.5 20c.2-3.6 2.1-5.4 5.5-5.4s5.3 1.8 5.5 5.4m.4-5c3.1-.3 5.1 1.4 5.6 4.6"/></svg>Meeting with others</strong><span>Plans with friends or other people.</span></label></div>
         </div></div>
         <div class="form-grid">
-          <div class="field full" id="slot-title-field"><label for="slot-title">Name</label><input id="slot-title" name="title" maxlength="60" placeholder="e.g. Project focus" required /></div>
+          <div class="field full" id="slot-title-field"><label id="slot-name-label" for="slot-title">Activity name</label><input id="slot-title" name="title" maxlength="60" placeholder="e.g. Badminton" required /></div>
           <div class="field full"><label for="slot-date-picker-button">Date</label><div class="picker-control date-picker" id="slot-date-picker" data-date-picker data-input="slot-date"><input type="hidden" id="slot-date" name="date" /><button class="picker-trigger" id="slot-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div>
           <div class="field"><label for="slot-start-picker-button">Starts</label><div class="picker-control time-picker" id="slot-start-picker" data-time-picker data-input="slot-start" data-end="false"><input type="hidden" id="slot-start" name="start" /><button class="picker-trigger" id="slot-start-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div>
           <div class="field"><label for="slot-end-picker-button">Ends</label><div class="picker-control time-picker" id="slot-end-picker" data-time-picker data-input="slot-end" data-end="true"><input type="hidden" id="slot-end" name="end" /><button class="picker-trigger" id="slot-end-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div>
@@ -424,7 +414,7 @@
   <script src="./supabase-config.js"></script>
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-    import { DAY_START_MINUTE, DAY_END_MINUTE, draggedMinuteRange, formatScheduleTimestamp, isPastDate, monthCalendarDates, nextRequestWindow, rangesOverlap, timeMinutes, timePickerHours, timePickerMinutes, validateRequestContact, validateTimeRange } from './timetable-rules.mjs?v=38e6d20';
+    import { DAY_START_MINUTE, DAY_END_MINUTE, canNavigateToPreviousWeek, draggedMinuteRange, formatScheduleTimestamp, isPastDate, monthCalendarDates, nextRequestWindow, normalizeSlotEventType, rangesOverlap, resolveSlotSelection, timeMinutes, timePickerHours, timePickerMinutes, validateRequestContact, validateTimeRange } from './timetable-rules.mjs?v=owner-event-types-1';
     (() => {
       const PX_PER_MINUTE = 32 / 30;
       const HCMC_TIMESTAMP = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
@@ -467,8 +457,8 @@
         setTimeout(updateHeaderClock, 1000 - now.getMilliseconds() + 20);
       }
       const dbTime = value => String(value || '').slice(0, 5);
-      const slotFromRow = row => ({ id: row.id, kind: row.kind, title: row.title, date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility });
-      const slotToRow = slot => ({ id: slot.id, kind: slot.kind, title: slot.title, slot_date: slot.date, start_time: slot.start, end_time: slot.end, visibility: slot.visibility });
+      const slotFromRow = row => ({ id: row.id, kind: row.kind, eventType: normalizeSlotEventType(row.kind, row.event_type), title: row.title, date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility });
+      const slotToRow = slot => ({ id: slot.id, kind: slot.kind, event_type: normalizeSlotEventType(slot.kind, slot.eventType), title: slot.title, slot_date: slot.date, start_time: slot.start, end_time: slot.end, visibility: slot.visibility });
       const requestFromRow = row => ({ id: row.id, slotId: row.slot_id, availabilityTitle: row.availability_title, name: row.name, phone: row.phone || '', email: row.email || '', note: row.note || '', date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), status: row.status, createdAt: row.created_at });
       const save = async () => {
         if (!supabase || !ownerAuthenticated || !ownerView) return false;
@@ -738,16 +728,20 @@
           if (item.visibility === 'private') return { title: 'Unavailable', sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
           return { title: item.title, sub: `${formatTime(item.start)} – ${formatTime(item.end)}` };
         }
-        if (item.kind === 'availability') return { title: item.title || 'Open for booking', sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Open` };
+        if (item.kind === 'availability') return { title: 'Open for booking', sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Open` };
         if (item.kind === 'booking') return { title: `Booking · ${item.name}`, sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Confirmed` };
         if (item.kind === 'pending') return { title: `Request · ${item.name}`, sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Needs review` };
-        if (item.visibility === 'private') return { title: item.title, sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Private` };
-        return { title: item.title, sub: `${formatTime(item.start)} – ${formatTime(item.end)} · Public` };
+        const eventTypeLabel = item.eventType === 'meeting' ? 'Meeting' : 'Personal';
+        if (item.visibility === 'private') return { title: item.title, sub: `${formatTime(item.start)} – ${formatTime(item.end)} · ${eventTypeLabel} · Private` };
+        return { title: item.title, sub: `${formatTime(item.start)} – ${formatTime(item.end)} · ${eventTypeLabel} · Public` };
       }
       function renderCalendar() {
+        const currentWeek = startOfWeek(new Date());
+        if (visitorMode && week < currentWeek) week = currentWeek;
         updateWeekTitle();
         const dates = weekDates();
         const todayKey = dateKey(new Date());
+        $('#prev-week').hidden = !canNavigateToPreviousWeek(dateKey(week), dateKey(currentWeek), visitorMode);
         $('#day-head').innerHTML = `<div class="day-head-spacer"></div>` + dates.map(date => {
           const key = dateKey(date), today = key === todayKey, past = isPastDate(key, todayKey);
           return `<div class="day-head-cell ${today ? 'today' : ''} ${past ? 'past-day' : ''}" ${past ? 'title="Past day"' : ''}>${date.toLocaleDateString('en-US', { weekday: 'short' })}<br><span class="date-number">${date.getDate()}</span></div>`;
@@ -794,10 +788,6 @@
         const weekSlots = state.slots.filter(slot => dates.some(d => dateKey(d) === slot.date) && !(slot.kind === 'availability' && state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))));
         $('#stat-slots').textContent = String(weekSlots.length + state.requests.filter(r => r.status === 'accepted' && dates.some(d => dateKey(d) === r.date)).length);
         $('#stat-open').textContent = String(state.slots.filter(slot => slot.kind === 'availability' && dates.some(d => dateKey(d) === slot.date) && !state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))).length);
-        const hasSlots = dates.some(d => itemEventsForDay(dateKey(d)).length > 0);
-        const hasBookableTime = dates.some(d => itemEventsForDay(dateKey(d)).some(item => item.kind === 'availability' && !isPastSlot(item.date, item.start)));
-        $('#empty-banner').hidden = visitorMode ? hasBookableTime : hasSlots;
-        $('#empty-banner').textContent = visitorMode ? 'No listed openings this week. Use “Request a time” to suggest a free time anyway; it stays pending until the owner reviews it.' : 'Your timetable is clear. Add a personal event or create an open time for people to request.';
         $('#legend').innerHTML = visitorMode ? '<span class="legend-item"><i class="legend-swatch available"></i>Available to request</span><span class="legend-item"><i class="legend-swatch private"></i>Unavailable</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>' : '<span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>';
         updateRequestCounts();
       }
@@ -882,25 +872,29 @@
         $('#header-nav').style.display = ownerView ? 'flex' : 'none';
         $('#mode-note').innerHTML = value ? (ownerView ? 'This preview shows the public view' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>Click an available time to request it') : `${icon('lock')}Only you can see private slot names`;
         $('#add-slot').style.display = ownerView && !value ? 'inline-flex' : 'none';
+        $('#open-booking-slot').style.display = ownerView && !value ? 'inline-flex' : 'none';
         $('#preview-button').style.display = ownerView ? 'inline-flex' : 'none';
         $('.heading-actions').style.display = 'flex';
-        $('.below-grid').style.display = ownerView && !value ? 'grid' : 'none';
+        $('#week-summary').style.display = ownerView && !value ? 'inline-flex' : 'none';
         $('#nav-requests').style.display = ownerView ? 'flex' : 'none';
         $('#nav-calendar-label').textContent = ownerView ? 'My timetable' : 'Booking page';
         $('#page-title').textContent = publicVisitor ? 'Book a time' : value ? 'Visitor preview' : 'My timetable';
-        $('#page-eyebrow').textContent = publicVisitor ? 'Book a meeting' : value ? 'Public view' : 'Your week at a glance';
         $('#page-subtitle').textContent = publicVisitor ? 'Drag across a day to request any future time, or choose a listed opening. No sign-in needed; the owner confirms before it is booked.' : value ? 'This is the public schedule guests see. Private time only appears as unavailable.' : 'Plan your time, set what others can see, and make room for good conversations.';
         $('#guest-request').style.display = publicVisitor ? 'inline-flex' : 'none';
         $('#preview-button').innerHTML = value ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m19 12-7 7-7-7m7 7V5"/></svg>Back to my view' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page';
         renderCalendar();
         return true;
       }
-      function openSlotModal(slot = null, date = null) {
+      function openSlotModal(slot = null, date = null, mode = 'event') {
         if (visitorMode || !ownerView) return;
         editingSlotId = slot?.id || null;
         closePickers();
         const form = $('#slot-form'); form.reset();
-        $('#slot-modal-title').textContent = slot ? 'Edit time slot' : 'Add time slot';
+        const kind = slot?.kind || mode;
+        $('#slot-modal-title').textContent = kind === 'availability'
+          ? (slot ? 'Edit booking availability' : 'Open time for booking')
+          : (slot ? 'Edit time slot' : 'Add time slot');
+        $('#slot-modal-copy').textContent = kind === 'availability' ? 'Guests can request this time; it is only booked after you accept.' : 'Add personal time or a meeting with others to your timetable.';
         $('#save-slot').textContent = slot ? 'Save changes' : 'Save slot';
         $('#delete-slot').hidden = !slot;
         $('#slot-error').classList.remove('show');
@@ -909,17 +903,23 @@
         setTimeValue('slot-start', slot?.start || '09:00');
         setTimeValue('slot-end', slot?.end || '10:00');
         $('#slot-title').value = slot?.title || '';
-        $(`input[name="kind"][value="${slot?.kind || 'event'}"]`).checked = true;
+        $('#slot-kind').value = kind;
+        $(`input[name="eventType"][value="${slot?.eventType || 'personal'}"]`).checked = true;
         $(`input[name="visibility"][value="${slot?.visibility || 'public'}"]`).checked = true;
         updateSlotFormKind();
         $('#slot-modal-backdrop').classList.add('open');
         setTimeout(() => (slot ? $('#slot-title') : $('#slot-title')).focus(), 40);
       }
       function updateSlotFormKind() {
-        const availability = $('input[name="kind"]:checked', $('#slot-form')).value === 'availability';
-        $('#slot-title-field').hidden = availability;
+        const availability = $('#slot-kind').value === 'availability';
+        const eventType = $('input[name="eventType"]:checked', $('#slot-form')).value;
+        $('#slot-type-field').style.display = availability ? 'none' : 'grid';
+        $('#slot-title-field').style.display = availability ? 'none' : 'grid';
         $('#slot-title').required = !availability;
-        $('#visibility-field').hidden = availability;
+        $('#visibility-field').style.display = availability ? 'none' : 'grid';
+        $('#slot-name-label').textContent = eventType === 'meeting' ? 'Meeting name' : 'Activity name';
+        $('#slot-title').placeholder = eventType === 'meeting' ? 'e.g. Coffee with Mai' : 'e.g. Badminton';
+        if (availability) $('#slot-title').value = '';
       }
       function openBookingModal(slot = null, requestRange = null) {
         if (!supabase) { toast('Online booking is not connected yet.'); return; }
@@ -1035,6 +1035,7 @@
       $('#next-week').addEventListener('click', () => { week.setDate(week.getDate() + 7); renderCalendar(); });
       $('#today-button').addEventListener('click', () => { week = startOfWeek(new Date()); renderCalendar(); });
       $('#add-slot').addEventListener('click', () => openSlotModal());
+      $('#open-booking-slot').addEventListener('click', () => openSlotModal(null, null, 'availability'));
       $('#guest-request').addEventListener('click', () => openBookingModal());
       $('#preview-button').addEventListener('click', () => setVisitorMode(!visitorMode));
       $('#owner-mode').addEventListener('click', () => setVisitorMode(false));
@@ -1121,7 +1122,7 @@
         closePickers();
         $$('.modal-backdrop.open').forEach(backdrop => backdrop.classList.remove('open'));
       });
-      $$('input[name="kind"]', $('#slot-form')).forEach(input => input.addEventListener('change', updateSlotFormKind));
+      $$('input[name="eventType"]', $('#slot-form')).forEach(input => input.addEventListener('change', updateSlotFormKind));
 
       $('#calendar-body').addEventListener('click', event => {
         if (Date.now() < suppressCalendarClickUntil) { event.preventDefault(); return; }
@@ -1137,8 +1138,10 @@
       $('#slot-form').addEventListener('submit', async event => {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
-        const kind = form.get('kind');
-        const slot = { id: editingSlotId || uid(), kind, title: kind === 'availability' ? 'Open for booking' : String(form.get('title')).trim(), date: form.get('date'), start: form.get('start'), end: form.get('end'), visibility: kind === 'availability' ? 'public' : form.get('visibility') };
+        const selection = resolveSlotSelection($('#slot-kind').value === 'availability' ? 'availability' : form.get('eventType'));
+        if (!selection) { showError('#slot-error', 'Choose a valid slot type.'); return; }
+        const { kind, eventType } = selection;
+        const slot = { id: editingSlotId || uid(), kind, eventType, title: kind === 'availability' ? 'Open for booking' : String(form.get('title')).trim(), date: form.get('date'), start: form.get('start'), end: form.get('end'), visibility: kind === 'availability' ? 'public' : form.get('visibility') };
         const error = $('#slot-error'); error.classList.remove('show');
         if (!slot.date || !validateTimeRange(slot.start, slot.end)) { showError('#slot-error', 'Choose a valid time range within the day.'); return; }
         if (kind === 'availability' && isPastSlot(slot.date, slot.start)) { showError('#slot-error', 'Booking availability must start in the future.'); return; }
