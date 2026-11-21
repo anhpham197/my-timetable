@@ -64,12 +64,32 @@ export function nextRequestWindow(now = new Date()) {
   };
 }
 
-export function timeOptions({ end = false } = {}) {
-  const values = [];
-  const first = end ? 30 : 0;
-  const last = end ? DAY_END_MINUTE : DAY_END_MINUTE - 30;
-  for (let minute = first; minute <= last; minute += 30) values.push(formatMinute(minute));
-  return values;
+export function timePickerHours({ end = false } = {}) {
+  return Array.from({ length: end ? 25 : 24 }, (_, hour) => String(hour).padStart(2, '0'));
+}
+
+export function timePickerMinutes() {
+  return Array.from({ length: 60 }, (_, minute) => String(minute).padStart(2, '0'));
+}
+
+export function draggedMinuteRange(anchorMinute, pointerMinute) {
+  const anchor = Math.max(0, Math.min(DAY_END_MINUTE - 1, Math.trunc(Number(anchorMinute) || 0)));
+  const pointer = Math.max(0, Math.min(DAY_END_MINUTE, Math.trunc(Number(pointerMinute) || 0)));
+  if (pointer > anchor) return { start: anchor, end: pointer };
+  if (pointer < anchor) return { start: pointer, end: anchor };
+  return { start: anchor, end: anchor + 1 };
+}
+
+export function formatScheduleTimestamp(dateKey, clock) {
+  const [year, month, day] = String(dateKey).split('-').map(Number);
+  const minute = timeMinutes(clock);
+  if (![year, month, day, minute].every(Number.isFinite)) return '';
+  const instant = new Date(Date.UTC(year, month - 1, day) + minute * 60_000);
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'UTC', weekday: 'short', day: '2-digit', month: 'short',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'
+  }).formatToParts(instant).map(part => [part.type, part.value]));
+  return `${parts.weekday} ${parts.day} ${parts.month} ${parts.hour}:${parts.minute}:${parts.second} GMT+7`;
 }
 
 export function monthCalendarDates(year, month) {

@@ -29,13 +29,13 @@
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; color: var(--ink); background: var(--canvas); min-width: 320px; }
+    body { margin: 0; color: var(--ink); background: var(--canvas); min-width: 320px; height: 100vh; height: 100dvh; overflow: hidden; }
     button, input, textarea, select { font: inherit; }
     button { cursor: pointer; }
     button:focus-visible, a:focus-visible, select:focus-visible { outline: 3px solid rgba(141,41,71,.2); outline-offset: 3px; }
     button:not(:disabled):active { transform: translateY(0) scale(.985); }
-    .app-shell { min-height: 100vh; }
-    .main { width: 100%; max-width: 1600px; min-width: 0; margin: 0 auto; padding: 0 38px 50px; }
+    .app-shell { height: 100vh; height: 100dvh; }
+    .main { width: 100%; max-width: 1600px; height: 100%; min-width: 0; margin: 0 auto; padding: 0 38px 12px; display: flex; flex-direction: column; }
     .topbar { min-height: 86px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--line); margin-bottom: 29px; animation: soft-reveal .45s cubic-bezier(.2,.7,.25,1) both; }
     .header-brand { display: inline-flex; align-items: center; gap: 12px; flex: none; color: #351b21; text-decoration: none; font-family: Manrope, sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -.8px; white-space: nowrap; transition: transform .2s ease; }
     .header-brand:hover { transform: translateY(-1px); }
@@ -79,7 +79,9 @@
     .mode-switch button.active { color: #67374a; background: white; box-shadow: 0 1px 3px rgba(29,39,56,.12); }
     .mode-note { display: flex; align-items: center; gap: 6px; color: #8791a2; font-size: 10px; }
     .mode-note svg { width: 13px; height: 13px; color: #b66580; }
-    .calendar-card { border: 1px solid #e6e9ef; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 4px 14px rgba(34,46,70,.025); transition: box-shadow .25s ease, border-color .25s ease; animation: soft-reveal .5s .1s cubic-bezier(.2,.7,.25,1) both; }
+    #calendar-page { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    #calendar-page > .page-heading, #calendar-page > .modebar, #calendar-page > .visitor-banner, #calendar-page > .connection-banner, #calendar-page > .below-grid, #calendar-page > .empty-banner { flex: none; }
+    .calendar-card { border: 1px solid #e6e9ef; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 4px 14px rgba(34,46,70,.025); transition: box-shadow .25s ease, border-color .25s ease; animation: soft-reveal .5s .1s cubic-bezier(.2,.7,.25,1) both; flex: 1; min-height: 180px; display: flex; flex-direction: column; }
     .calendar-card:hover { border-color: #e1d7dc; box-shadow: 0 9px 28px rgba(62,27,44,.06); }
     .calendar-toolbar { padding: 13px 16px; min-height: 57px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .week-nav { display: flex; align-items: center; gap: 8px; }
@@ -91,21 +93,25 @@
     .today-button { border: 0; background: transparent; color: #64728c; font-size: 10px; font-weight: 650; padding: 6px; }
     .today-button:hover { color: var(--blue); }
     .view-picker { color: #657188; border: 1px solid var(--line); padding: 6px 9px; border-radius: 7px; font-size: 10px; background: white; }
-    .calendar-scroll { overflow-x: auto; }
+    .calendar-scroll { overflow: auto; min-height: 0; flex: 1; overscroll-behavior: contain; scrollbar-color: #c9b0b9 #f7f3f5; scrollbar-width: thin; }
     .calendar-min-width { min-width: 760px; }
-    .day-head { display: grid; grid-template-columns: 65px repeat(7, minmax(0,1fr)); border-bottom: 1px solid var(--line); }
-    .day-head-spacer { border-right: 1px solid var(--line); }
+    .day-head { display: grid; grid-template-columns: 65px repeat(7, minmax(0,1fr)); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; background: white; }
+    .day-head-spacer { border-right: 1px solid var(--line); position: sticky; left: 0; z-index: 6; background: white; }
     .day-head-cell { text-align: center; padding: 11px 4px 10px; border-right: 1px solid var(--line); color: #8791a3; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
     .day-head-cell:last-child { border-right: 0; }
     .day-head-cell .date-number { display: inline-grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; color: #4d5a72; margin-top: 5px; font-size: 11px; letter-spacing: 0; }
     .day-head-cell.today { color: var(--blue); }
     .day-head-cell.today .date-number { background: var(--blue); color: white; }
     .calendar-body { display: grid; grid-template-columns: 65px repeat(7, minmax(0,1fr)); }
-    .time-rail { position: relative; border-right: 1px solid var(--line); background: #fdfdfe; }
+    .time-rail { position: sticky; left: 0; z-index: 3; border-right: 1px solid var(--line); background: #fdfdfe; }
     .hour-label { position: absolute; right: 8px; transform: translateY(-50%); font-size: 9px; color: #9ba4b3; white-space: nowrap; }
     .hour-label:first-child { transform: none; }
     .day-column { position: relative; border-right: 1px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, #f0f2f6 31px, #f0f2f6 32px, transparent 32px, transparent 63px, #e7eaf0 63px, #e7eaf0 64px); }
     .day-column:last-child { border-right: 0; }
+    .calendar-body.requestable .day-column { cursor: crosshair; touch-action: pan-y; }
+    .drag-selection-preview { position: absolute; left: 4px; right: 4px; z-index: 4; border: 1px solid #8d2947; border-left-width: 3px; border-radius: 6px; background: rgba(141,41,71,.2); box-shadow: 0 2px 10px rgba(141,41,71,.15); color: #682037; pointer-events: none; padding: 4px 6px; overflow: hidden; font-size: 9px; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .drag-selection-preview::after { content: "Release to request"; display: block; margin-top: 2px; font-size: 8px; font-weight: 600; opacity: .78; }
+    body.dragging-calendar { user-select: none; cursor: crosshair; }
     .day-column.today-column { background-color: #fcfcff; }
     .calendar-event { position: absolute; left: 5px; right: 5px; min-height: 31px; overflow: hidden; border-radius: 6px; border-left: 3px solid; padding: 5px 6px 4px; cursor: pointer; z-index: 1; transition: filter .15s, transform .15s; }
     .calendar-event:hover { filter: saturate(1.15); transform: translateY(-1px); z-index: 3; }
@@ -120,7 +126,7 @@
     .calendar-event.public-view:hover { box-shadow: 0 2px 8px rgba(32,131,106,.15); }
     .now-line { height: 2px; background: #eb6c6c; position: absolute; z-index: 2; left: 0; right: 0; pointer-events: none; }
     .now-line::before { content: ""; position: absolute; width: 6px; height: 6px; left: -3px; top: -2px; border-radius: 50%; background: #eb6c6c; }
-    .calendar-footer { padding: 11px 16px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; color: #919bab; font-size: 9px; }
+    .calendar-footer { flex: none; padding: 11px 16px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; color: #919bab; font-size: 9px; }
     .legend { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
     .legend-item { display: flex; align-items: center; gap: 5px; }
     .legend-swatch { width: 8px; height: 8px; border-radius: 2px; }
@@ -142,7 +148,7 @@
     .week-stat span { font-size: 10px; color: #8a94a4; }
     .week-stat strong { font-size: 11px; color: #3d4960; }
     .empty-banner { margin: 12px 0 0; padding: 11px 13px; border: 1px dashed #dce2ed; color: #748096; border-radius: 8px; font-size: 10px; line-height: 1.5; background: #fbfcfe; }
-    .request-page { display: none; }
+    .request-page { display: none; flex: 1; min-height: 0; overflow-y: auto; }
     .request-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 4px 0 17px; padding: 18px 20px; border: 1px solid #f1e4c8; background: #fffaf0; border-radius: 11px; }
     .request-summary h2 { font-size: 13px; margin: 0; color: #574827; }
     .request-summary p { margin: 5px 0 0; font-size: 10px; color: #8c7c5a; }
@@ -202,7 +208,10 @@
     .picker-trigger[aria-expanded="true"] { border-color: #a83a5a; box-shadow: 0 0 0 3px rgba(141,41,71,.1); }
     .picker-trigger .placeholder { color: #929baa; }
     .picker-trigger svg { width: 15px; height: 15px; color: #8d2947; flex: none; }
-    .picker-panel { margin-top: 7px; padding: 11px; border: 1px solid #ebe3e6; border-radius: 10px; background: white; box-shadow: 0 12px 28px rgba(62,27,44,.11); animation: picker-open .14s ease both; }
+    .picker-panel { position: absolute; top: calc(100% + 7px); left: 0; z-index: 15; width: max(100%, 260px); padding: 11px; border: 1px solid #ebe3e6; border-radius: 10px; background: white; box-shadow: 0 12px 28px rgba(62,27,44,.11); animation: picker-open .14s ease both; }
+    .date-picker-panel { width: max(100%, 290px); }
+    .time-picker-panel { width: min(286px, calc(100vw - 64px)); }
+    #slot-end-picker .time-picker-panel, #booking-end-picker .time-picker-panel { left: auto; right: 0; }
     .picker-panel[hidden] { display: none; }
     .date-picker-heading { display: grid; grid-template-columns: 32px 1fr 32px; align-items: center; gap: 5px; margin-bottom: 9px; }
     .date-picker-heading strong { text-align: center; font-size: 11px; color: #3b2930; }
@@ -221,11 +230,17 @@
     .picker-panel-foot { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0ecee; }
     .picker-text-button { border: 0; padding: 4px 6px; background: transparent; color: #8d2947; font-size: 9px; font-weight: 700; }
     .picker-text-button:hover { color: #682037; text-decoration: underline; }
-    .time-options { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 5px; max-height: 218px; overflow: auto; padding: 1px 2px 1px 1px; scrollbar-color: #d5b8c2 #faf7f8; scrollbar-width: thin; }
-    .time-option { min-height: 33px; border: 1px solid transparent; border-radius: 7px; background: #faf8f9; color: #514751; font-size: 9px; font-variant-numeric: tabular-nums; font-weight: 650; }
-    .time-option:hover { border-color: #ead5dd; background: #f8edf1; color: #8d2947; }
+    .time-wheels { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .time-wheel-group { min-width: 0; }
+    .time-wheel-label { display: block; margin: 0 0 5px 2px; color: #9a8790; font-size: 8px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
+    .time-wheel { display: grid; gap: 3px; max-height: 208px; overflow: auto; padding: 1px 3px 1px 1px; scrollbar-color: #d5b8c2 #faf7f8; scrollbar-width: thin; }
+    .time-option { min-height: 29px; border: 1px solid transparent; border-radius: 7px; background: #faf8f9; color: #514751; font-size: 10px; font-variant-numeric: tabular-nums; font-weight: 650; }
+    .time-option:hover:not(:disabled) { border-color: #ead5dd; background: #f8edf1; color: #8d2947; }
     .time-option.selected { border-color: #b55a75; background: #8d2947; color: white; box-shadow: 0 3px 7px rgba(141,41,71,.16); }
+    .time-option:disabled { opacity: .35; cursor: default; }
     .picker-hint { margin: 8px 2px 0; color: #9a8e94; font-size: 8px; }
+    .picker-range-preview { margin: 8px 0 0; padding: 8px 10px; border: 1px solid #eee3e8; border-radius: 8px; color: #764052; background: #fcf8fa; font-size: 9px; line-height: 1.5; font-variant-numeric: tabular-nums; white-space: pre-line; }
+    .picker-range-preview:empty { display: none; }
     .type-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .type-option { position: relative; }
     .type-option input { position: absolute; opacity: 0; pointer-events: none; }
@@ -252,7 +267,8 @@
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
     }
     @media (max-width: 1000px) {
-      .main { padding: 0 22px 35px; }
+      .main { padding: 0 22px 8px; }
+      .topbar { margin-bottom: 15px; }
       .below-grid { grid-template-columns: 1fr; }
       .topbar { gap: 12px; }
       .topbar-right { gap: 8px; }
@@ -260,8 +276,8 @@
       .auth-identity { max-width: 145px; }
     }
     @media (max-width: 760px) {
-      .main { padding: 0 14px 30px; }
-      .topbar { min-height: 0; display: grid; grid-template-columns: 1fr auto; padding: 12px 0; margin-bottom: 22px; gap: 10px; }
+      .main { padding: 0 14px 8px; }
+      .topbar { min-height: 0; display: grid; grid-template-columns: 1fr auto; padding: 8px 0; margin-bottom: 12px; gap: 8px; }
       .header-brand { grid-column: 1; grid-row: 1; }
       .header-nav { grid-column: 1 / -1; grid-row: 2; margin: 0; border-top: 1px solid var(--line); padding-top: 8px; }
       .header-nav .nav-item { padding: 8px 9px; font-size: 10px; }
@@ -270,10 +286,11 @@
       .topbar-right { grid-column: 2; grid-row: 1; margin: 0; gap: 7px; }
       .timezone { display: none; }
       .auth-identity { display: none !important; }
-      .page-heading { align-items: flex-start; flex-direction: column; gap: 14px; margin-bottom: 18px; }
-      h1 { font-size: 23px; }
-      .heading-actions { width: 100%; }
-      .heading-actions .button { flex: 1; }
+      .page-heading { align-items: flex-start; flex-direction: row; gap: 10px; margin-bottom: 11px; }
+      h1 { font-size: 21px; }
+      .subtitle { max-width: 45ch; line-height: 1.45; }
+      .heading-actions { width: auto; flex: none; }
+      .heading-actions .button { flex: none; }
       .modebar { align-items: flex-start; flex-direction: column; }
       .mode-note { padding-left: 3px; }
       .calendar-toolbar { padding: 11px 10px; }
@@ -284,6 +301,14 @@
       .request-card { grid-template-columns: 34px minmax(0,1fr); }
       .request-actions { grid-column: 2; }
       .request-summary { padding: 14px; }
+    }
+    @media (max-height: 720px) {
+      .topbar { min-height: 62px; margin-bottom: 12px; }
+      .page-heading { margin-bottom: 10px; }
+      .below-grid { display: none !important; }
+      .empty-banner { margin-top: 7px; padding: 7px 10px; }
+      .calendar-card { min-height: 120px; }
+      .calendar-footer { padding: 7px 12px; }
     }
     @media (max-width: 420px) {
       .header-nav .nav-item { padding: 7px; }
@@ -336,7 +361,7 @@
             <div class="week-nav"><button class="arrow-button" id="prev-week" aria-label="Previous week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button><button class="arrow-button" id="next-week" aria-label="Next week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button><div class="week-title" id="week-title"></div></div>
             <div class="toolbar-right"><button class="today-button" id="today-button">Today</button><select class="view-picker" aria-label="Calendar range" disabled><option>Week</option></select></div>
           </div>
-          <div class="calendar-scroll"><div class="calendar-min-width"><div class="day-head" id="day-head"></div><div class="calendar-body" id="calendar-body"></div></div></div>
+          <div class="calendar-scroll" tabindex="0" role="region" aria-label="Full-day weekly calendar. Scroll to view more hours and days."><div class="calendar-min-width"><div class="day-head" id="day-head"></div><div class="calendar-body" id="calendar-body"></div></div></div>
           <div class="calendar-footer"><div class="legend" id="legend"><span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span></div><span>Times shown in GMT+7</span></div>
         </div>
         <div class="below-grid">
@@ -370,6 +395,7 @@
           <div class="field full"><label for="slot-date-picker-button">Date</label><div class="picker-control date-picker" id="slot-date-picker" data-date-picker data-input="slot-date"><input type="hidden" id="slot-date" name="date" /><button class="picker-trigger" id="slot-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div>
           <div class="field"><label for="slot-start-picker-button">Starts</label><div class="picker-control time-picker" id="slot-start-picker" data-time-picker data-input="slot-start" data-end="false"><input type="hidden" id="slot-start" name="start" /><button class="picker-trigger" id="slot-start-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div>
           <div class="field"><label for="slot-end-picker-button">Ends</label><div class="picker-control time-picker" id="slot-end-picker" data-time-picker data-input="slot-end" data-end="true"><input type="hidden" id="slot-end" name="end" /><button class="picker-trigger" id="slot-end-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div>
+          <p class="picker-range-preview field full" id="slot-range-preview" role="status" aria-live="polite"></p>
           <div class="field full" id="visibility-field"><label>Who can see this slot?</label><div class="visibility-options">
             <div class="visibility-option"><input type="radio" name="visibility" value="public" id="visibility-public" checked><label for="visibility-public"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18m0-18a14 14 0 0 0 0 18"/></svg><span><strong>Public</strong><span>Others can see the name</span></span></label></div>
             <div class="visibility-option"><input type="radio" name="visibility" value="private" id="visibility-private"><label for="visibility-private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg><span><strong>Private</strong><span>Others only see unavailable</span></span></label></div>
@@ -385,8 +411,8 @@
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
       <div class="modal-head"><div><h2 id="booking-modal-title">Request this time</h2><p id="booking-slot-copy">No account needed. Add your name, phone, and a short message; email is optional.</p></div><button class="close-button" data-close="booking-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
       <form id="booking-form"><input type="hidden" name="slotId" id="booking-slot-id" />
-        <div class="form-grid" id="booking-time-fields" style="display:none"><div class="field full"><label for="booking-date-picker-button">Requested date</label><div class="picker-control date-picker" id="booking-date-picker" data-date-picker data-input="booking-date"><input type="hidden" id="booking-date" name="requestDate" /><button class="picker-trigger" id="booking-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-start-picker-button">Starts</label><div class="picker-control time-picker" id="booking-start-picker" data-time-picker data-input="booking-start" data-end="false"><input type="hidden" id="booking-start" name="requestStart" /><button class="picker-trigger" id="booking-start-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-end-picker-button">Ends</label><div class="picker-control time-picker" id="booking-end-picker" data-time-picker data-input="booking-end" data-end="true"><input type="hidden" id="booking-end" name="requestEnd" /><button class="picker-trigger" id="booking-end-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div></div>
-        <div class="form-grid" style="margin-top:13px"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required placeholder="Name" /></div><div class="field full"><label for="booker-phone">Your phone</label><input id="booker-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" minlength="7" maxlength="32" required placeholder="+84 912 345 678" /></div><div class="field full"><label for="booker-email">Email <span class="optional-label">(optional)</span></label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">Short message</label><textarea id="booking-note" name="note" maxlength="300" required placeholder="What would you like to discuss? (up to 300 characters)"></textarea></div></div>
+        <div class="form-grid" id="booking-time-fields" style="display:none"><div class="field full"><label for="booking-date-picker-button">Requested date</label><div class="picker-control date-picker" id="booking-date-picker" data-date-picker data-input="booking-date"><input type="hidden" id="booking-date" name="requestDate" /><button class="picker-trigger" id="booking-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-start-picker-button">Starts</label><div class="picker-control time-picker" id="booking-start-picker" data-time-picker data-input="booking-start" data-end="false"><input type="hidden" id="booking-start" name="requestStart" /><button class="picker-trigger" id="booking-start-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-end-picker-button">Ends</label><div class="picker-control time-picker" id="booking-end-picker" data-time-picker data-input="booking-end" data-end="true"><input type="hidden" id="booking-end" name="requestEnd" /><button class="picker-trigger" id="booking-end-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div><p class="picker-range-preview field full" id="booking-range-preview" role="status" aria-live="polite"></p></div>
+        <div class="form-grid" style="margin-top:13px"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required /></div><div class="field full"><label for="booker-phone">Your phone</label><input id="booker-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" minlength="7" maxlength="32" required /></div><div class="field full"><label for="booker-email">Email <span class="optional-label">(optional)</span></label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">Short message</label><textarea id="booking-note" name="note" maxlength="300" required placeholder="What would you like to discuss? (up to 300 characters)"></textarea></div></div>
         <p class="modal-error" id="booking-error"></p><div class="modal-actions"><span></span><div class="right-actions"><button class="button" type="button" data-close="booking-modal-backdrop">Cancel</button><button class="button primary" type="submit">Send request</button></div></div>
       </form>
     </section>
@@ -396,10 +422,10 @@
   <script src="./supabase-config.js"></script>
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-    import { DAY_START_MINUTE, DAY_END_MINUTE, monthCalendarDates, nextRequestWindow, rangesOverlap, timeMinutes, timeOptions, validateRequestContact, validateTimeRange } from './timetable-rules.mjs';
+    import { DAY_START_MINUTE, DAY_END_MINUTE, draggedMinuteRange, formatScheduleTimestamp, monthCalendarDates, nextRequestWindow, rangesOverlap, timeMinutes, timePickerHours, timePickerMinutes, validateRequestContact, validateTimeRange } from './timetable-rules.mjs';
     (() => {
       const PX_PER_MINUTE = 32 / 30;
-      const HCMC_TIME = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Ho_Chi_Minh', hour: 'numeric', minute: '2-digit' });
+      const HCMC_TIMESTAMP = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
       const HCMC_CLOCK = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -426,14 +452,17 @@
       let bookingTargetId = null;
       let activeSessionKey = 'not-loaded';
       let ownerViewIntent = sessionStorage.getItem('timetable-owner-view-after-signin') === '1';
+      let dragSelection = null;
+      let suppressCalendarClickUntil = 0;
 
       const toast = message => { const el = $('#snackbar'); el.textContent = message; el.classList.add('show'); clearTimeout(snackbarTimer); snackbarTimer = setTimeout(() => el.classList.remove('show'), 2800); };
       function updateHeaderClock() {
         const now = new Date();
         const clock = $('#header-time');
-        clock.textContent = HCMC_TIME.format(now);
+        const parts = Object.fromEntries(HCMC_TIMESTAMP.formatToParts(now).map(part => [part.type, part.value]));
+        clock.textContent = `${parts.weekday} ${parts.day} ${parts.month} ${parts.hour}:${parts.minute}:${parts.second} GMT+7`;
         clock.dateTime = now.toISOString();
-        setTimeout(updateHeaderClock, 60000 - now.getSeconds() * 1000 - now.getMilliseconds() + 20);
+        setTimeout(updateHeaderClock, 1000 - now.getMilliseconds() + 20);
       }
       const dbTime = value => String(value || '').slice(0, 5);
       const slotFromRow = row => ({ id: row.id, kind: row.kind, title: row.title, date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility });
@@ -567,7 +596,8 @@
       }
       const isPastSlot = (date, time) => { const now = Object.fromEntries(HCMC_CLOCK.formatToParts(new Date()).map(part => [part.type, part.value])); const today = `${now.year}-${now.month}-${now.day}`; const currentMinute = Number(now.hour) * 60 + Number(now.minute); return date < today || date === today && timeMinutes(time) <= currentMinute; };
       const formatTime = value => { const [h,m] = value.split(':').map(Number); const d = new Date(2000, 0, 1, h, m); return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: m ? '2-digit' : undefined }); };
-      const pickerTimeLabel = value => value === '24:00' ? '12:00 AM · midnight' : new Date(2000, 0, 1, ...value.split(':').map(Number)).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      const pickerTimeLabel = value => value === '24:00' ? '24:00 · end of day' : value;
+      const timestampRange = (date, start, end) => `${formatScheduleTimestamp(date, start)} – ${formatScheduleTimestamp(date, end)}`;
       const monthKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
       function closePickers(except = null) {
         $$('[data-picker-panel]').forEach(panel => {
@@ -584,6 +614,7 @@
         label.textContent = value ? fromKey(value).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'Choose a date';
         label.classList.toggle('placeholder', !value);
         input.dispatchEvent(new Event('change', { bubbles: true }));
+        updateRangePreview(inputId.startsWith('slot-') ? 'slot' : 'booking');
       }
       function setTimeValue(inputId, value) {
         const input = $(`#${inputId}`), widget = $(`[data-time-picker][data-input="${inputId}"]`);
@@ -591,6 +622,17 @@
         const label = $('[data-picker-label]', widget);
         label.textContent = value ? pickerTimeLabel(value) : 'Choose a time';
         label.classList.toggle('placeholder', !value);
+        updateRangePreview(inputId.startsWith('slot-') ? 'slot' : 'booking');
+      }
+      function updateRangePreview(prefix) {
+        const preview = $(`#${prefix}-range-preview`);
+        if (!preview) return;
+        const date = $(`#${prefix}-date`).value;
+        const start = $(`#${prefix}-start`).value;
+        const end = $(`#${prefix}-end`).value;
+        preview.textContent = date && start && end
+          ? `Starts: ${formatScheduleTimestamp(date, start)}\nEnds: ${formatScheduleTimestamp(date, end)}`
+          : '';
       }
       function renderDatePicker(widget) {
         const input = $(`#${widget.dataset.input}`);
@@ -618,8 +660,15 @@
       function renderTimePicker(widget) {
         const input = $(`#${widget.dataset.input}`);
         const end = widget.dataset.end === 'true';
-        const options = timeOptions({ end });
-        $('[data-picker-panel]', widget).innerHTML = `<div class="time-options" role="listbox" aria-label="Choose ${end ? 'end' : 'start'} time">${options.map(value => `<button type="button" role="option" aria-selected="${value === input.value}" class="time-option ${value === input.value ? 'selected' : ''}" data-picker-time="${value}">${pickerTimeLabel(value)}</button>`).join('')}</div><p class="picker-hint">30-minute steps${end ? ' · 12:00 AM ends the day' : ''}</p>`;
+        const [selectedHour, selectedMinute] = (input.value || (end ? '10:00' : '09:00')).split(':');
+        const hours = timePickerHours({ end });
+        const minutes = timePickerMinutes();
+        const hourItems = hours.map(hour => `<button type="button" role="option" aria-selected="${hour === selectedHour}" class="time-option ${hour === selectedHour ? 'selected' : ''}" data-picker-hour="${hour}">${hour === '24' ? '24 · end' : hour}</button>`).join('');
+        const minuteItems = minutes.map(minute => {
+          const disabled = end && selectedHour === '24' && minute !== '00';
+          return `<button type="button" role="option" aria-selected="${minute === selectedMinute}" class="time-option ${minute === selectedMinute ? 'selected' : ''}" data-picker-minute="${minute}" ${disabled ? 'disabled' : ''}>${minute}</button>`;
+        }).join('');
+        $('[data-picker-panel]', widget).innerHTML = `<div class="time-wheels" aria-label="Choose ${end ? 'end' : 'start'} time"><div class="time-wheel-group"><span class="time-wheel-label">Hour</span><div class="time-wheel" role="listbox" aria-label="Hour">${hourItems}</div></div><div class="time-wheel-group"><span class="time-wheel-label">Minute</span><div class="time-wheel" role="listbox" aria-label="Minute">${minuteItems}</div></div></div><p class="picker-hint">Choose any minute${end ? ' · 24:00 ends the day' : ''}</p>`;
       }
       function initializePickers() {
         $$('[data-time-picker]').forEach(widget => setTimeValue(widget.dataset.input, widget.dataset.input === 'slot-start' || widget.dataset.input === 'booking-start' ? '09:00' : widget.dataset.input === 'slot-end' ? '10:00' : '09:30'));
@@ -641,7 +690,11 @@
         } else renderTimePicker(widget);
         panel.hidden = false;
         $('[data-picker-trigger]', widget).setAttribute('aria-expanded', 'true');
-        panel.querySelector('.selected')?.focus();
+        if (widget.matches('[data-date-picker]')) panel.querySelector('.selected')?.focus();
+        else {
+          panel.querySelector('[data-picker-hour].selected')?.scrollIntoView({ block: 'center' });
+          panel.querySelector('[data-picker-minute].selected')?.scrollIntoView({ block: 'center' });
+        }
       }
       function stepPickerMonth(widget, amount) {
         const [year, month] = widget.dataset.month.split('-').map(Number);
@@ -734,6 +787,7 @@
           body += '</div>';
         });
         $('#calendar-body').style.height = `${(DAY_END_MINUTE - DAY_START_MINUTE) * PX_PER_MINUTE}px`;
+        $('#calendar-body').classList.toggle('requestable', visitorMode && !ownerView && Boolean(supabase));
         $('#calendar-body').innerHTML = body;
         const weekSlots = state.slots.filter(slot => dates.some(d => dateKey(d) === slot.date) && !(slot.kind === 'availability' && state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))));
         $('#stat-slots').textContent = String(weekSlots.length + state.requests.filter(r => r.status === 'accepted' && dates.some(d => dateKey(d) === r.date)).length);
@@ -744,6 +798,38 @@
         $('#empty-banner').textContent = visitorMode ? 'No listed openings this week. Use “Request a time” to suggest a free time anyway; it stays pending until the owner reviews it.' : 'Your timetable is clear. Add a personal event or create an open time for people to request.';
         $('#legend').innerHTML = visitorMode ? '<span class="legend-item"><i class="legend-swatch available"></i>Available to request</span><span class="legend-item"><i class="legend-swatch private"></i>Unavailable</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>' : '<span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span>';
         updateRequestCounts();
+      }
+      const minuteToClock = minute => `${String(Math.floor(minute / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`;
+      const selectionRange = selection => {
+        const minute = Math.max(0, Math.min(DAY_END_MINUTE, Math.floor((selection.pointerY - selection.column.getBoundingClientRect().top) / PX_PER_MINUTE)));
+        return draggedMinuteRange(selection.anchorMinute, minute);
+      };
+      function paintDragSelection() {
+        if (!dragSelection) return;
+        const range = selectionRange(dragSelection);
+        let overlay = $('.drag-selection-preview', dragSelection.column);
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.className = 'drag-selection-preview';
+          overlay.setAttribute('aria-hidden', 'true');
+          dragSelection.column.append(overlay);
+        }
+        overlay.style.top = `${range.start * PX_PER_MINUTE}px`;
+        overlay.style.height = `${Math.max(12, (range.end - range.start) * PX_PER_MINUTE)}px`;
+        overlay.textContent = `${minuteToClock(range.start)} – ${minuteToClock(range.end)}`;
+      }
+      function finishDragSelection(openRequest) {
+        if (!dragSelection) return;
+        const selection = dragSelection;
+        const range = selectionRange(selection);
+        const moved = selection.didMove;
+        $('.drag-selection-preview', selection.column)?.remove();
+        dragSelection = null;
+        document.body.classList.remove('dragging-calendar');
+        if (openRequest && moved && range.end > range.start) {
+          suppressCalendarClickUntil = Date.now() + 300;
+          openBookingModal(null, { date: selection.column.dataset.date, start: minuteToClock(range.start), end: minuteToClock(range.end) });
+        }
       }
       function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
@@ -763,7 +849,7 @@
         const actions = confirmed ? `<div class="request-actions"><button class="button danger" data-cancel-booking="${request.id}">Cancel booking</button></div>` : `<div class="request-actions"><button class="button" data-decline="${request.id}">Decline</button><button class="button primary" data-accept="${request.id}">Accept</button></div>`;
         const contact = `<p class="request-note">Phone: ${escapeHtml(request.phone || 'Not provided')}</p>${request.email ? `<p class="request-note">Email: ${escapeHtml(request.email)}</p>` : ''}`;
         const note = request.note ? `<p class="request-note">“${escapeHtml(request.note)}”</p>` : '';
-        return `<article class="request-card"><div class="avatar">${escapeHtml(initials(request.name))}</div><div><div class="request-meta"><strong>${escapeHtml(request.name)}</strong>${status}</div><div class="request-time">${escapeHtml(formatDate(request.date))} · ${escapeHtml(formatTime(request.start))} – ${escapeHtml(formatTime(request.end))}</div>${contact}${note}</div>${actions}</article>`;
+        return `<article class="request-card"><div class="avatar">${escapeHtml(initials(request.name))}</div><div><div class="request-meta"><strong>${escapeHtml(request.name)}</strong>${status}</div><div class="request-time">${escapeHtml(timestampRange(request.date, request.start, request.end))}</div>${contact}${note}</div>${actions}</article>`;
       }
       function renderRequests() {
         const pending = state.requests.filter(isPending).sort((a,b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start));
@@ -801,7 +887,7 @@
         $('#nav-calendar-label').textContent = ownerView ? 'My timetable' : 'Booking page';
         $('#page-title').textContent = publicVisitor ? 'Book a time' : value ? 'Visitor preview' : 'My timetable';
         $('#page-eyebrow').textContent = publicVisitor ? 'Book a meeting' : value ? 'Public view' : 'Your week at a glance';
-        $('#page-subtitle').textContent = publicVisitor ? 'No account or sign-in needed. Choose a listed opening or request another free time; the owner will confirm before it is booked.' : value ? 'This is the public schedule guests see. Private time only appears as unavailable.' : 'Plan your time, set what others can see, and make room for good conversations.';
+        $('#page-subtitle').textContent = publicVisitor ? 'Drag across a day to request any future time, or choose a listed opening. No sign-in needed; the owner confirms before it is booked.' : value ? 'This is the public schedule guests see. Private time only appears as unavailable.' : 'Plan your time, set what others can see, and make room for good conversations.';
         $('#guest-request').style.display = publicVisitor ? 'inline-flex' : 'none';
         $('#preview-button').innerHTML = value ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m19 12-7 7-7-7m7 7V5"/></svg>Back to my view' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>Booking page';
         renderCalendar();
@@ -833,7 +919,7 @@
         $('#slot-title').required = !availability;
         $('#visibility-field').hidden = availability;
       }
-      function openBookingModal(slot = null) {
+      function openBookingModal(slot = null, requestRange = null) {
         if (!supabase) { toast('Online booking is not connected yet.'); return; }
         bookingTargetId = slot?.id || null;
         closePickers();
@@ -843,9 +929,9 @@
         const timeFields = $('#booking-time-fields');
         timeFields.style.display = slot ? 'none' : 'grid';
         if (slot) {
-          $('#booking-slot-copy').textContent = `${formatDate(slot.date)} · ${formatTime(slot.start)} – ${formatTime(slot.end)}. No account needed; your name, phone, and short message are required. Email is optional.`;
+          $('#booking-slot-copy').textContent = `${timestampRange(slot.date, slot.start, slot.end)}. No account needed; your name, phone, and short message are required. Email is optional.`;
         } else {
-          const suggested = nextRequestWindow();
+          const suggested = requestRange || nextRequestWindow();
           setDatePickerMin('booking-date', dateKey(new Date()));
           setDateValue('booking-date', suggested.date);
           setTimeValue('booking-start', suggested.start);
@@ -963,6 +1049,37 @@
       $('#requests-back').addEventListener('click', () => setPage('calendar'));
       $$('[data-close]').forEach(button => button.addEventListener('click', () => closeModal(button.dataset.close)));
       $$('.modal-backdrop').forEach(backdrop => backdrop.addEventListener('click', event => { if (event.target === backdrop) { closePickers(); backdrop.classList.remove('open'); } }));
+      $('#calendar-body').addEventListener('pointerdown', event => {
+        const column = event.target.closest('.day-column');
+        if (!$('#calendar-body').classList.contains('requestable') || !column || event.target.closest('.calendar-event') || event.button !== 0) return;
+        const rect = column.getBoundingClientRect();
+        const anchorMinute = Math.max(0, Math.min(DAY_END_MINUTE - 1, Math.floor((event.clientY - rect.top) / PX_PER_MINUTE)));
+        if (isPastSlot(column.dataset.date, minuteToClock(anchorMinute))) return;
+        dragSelection = { column, pointerId: event.pointerId, anchorMinute, pointerY: event.clientY, startY: event.clientY, didMove: false };
+        document.body.classList.add('dragging-calendar');
+        try { column.setPointerCapture(event.pointerId); } catch {}
+        paintDragSelection();
+      });
+      $('#calendar-body').addEventListener('pointermove', event => {
+        if (!dragSelection || dragSelection.pointerId !== event.pointerId) return;
+        dragSelection.pointerY = event.clientY;
+        dragSelection.didMove ||= Math.abs(event.clientY - dragSelection.startY) >= 3;
+        const scroller = $('.calendar-scroll');
+        const bounds = scroller.getBoundingClientRect();
+        if (event.clientY < bounds.top + 28) scroller.scrollTop -= Math.max(3, Math.ceil((bounds.top + 28 - event.clientY) / 2));
+        else if (event.clientY > bounds.bottom - 28) scroller.scrollTop += Math.max(3, Math.ceil((event.clientY - bounds.bottom + 28) / 2));
+        paintDragSelection();
+      });
+      $('#calendar-body').addEventListener('pointerup', event => {
+        if (dragSelection?.pointerId === event.pointerId) {
+          dragSelection.pointerY = event.clientY;
+          dragSelection.didMove ||= Math.abs(event.clientY - dragSelection.startY) >= 3;
+          finishDragSelection(true);
+        }
+      });
+      $('#calendar-body').addEventListener('pointercancel', event => {
+        if (dragSelection?.pointerId === event.pointerId) finishDragSelection(false);
+      });
       document.addEventListener('click', event => {
         const trigger = event.target.closest('[data-picker-trigger]');
         if (trigger) { togglePicker(trigger.closest('.picker-control')); return; }
@@ -972,8 +1089,27 @@
         if (today) { const widget = today.closest('[data-date-picker]'); const minDate = widget.dataset.minDate || ''; const currentDay = dateKey(new Date()); if (!minDate || currentDay >= minDate) setDateValue(widget.dataset.input, currentDay); closePickers(); return; }
         const day = event.target.closest('[data-calendar-date]');
         if (day) { const widget = day.closest('[data-date-picker]'); setDateValue(widget.dataset.input, day.dataset.calendarDate); closePickers(); return; }
-        const time = event.target.closest('[data-picker-time]');
-        if (time) { const widget = time.closest('[data-time-picker]'); setTimeValue(widget.dataset.input, time.dataset.pickerTime); closePickers(); return; }
+        const hour = event.target.closest('[data-picker-hour]');
+        if (hour) {
+          const widget = hour.closest('[data-time-picker]');
+          const input = $(`#${widget.dataset.input}`);
+          const [, currentMinute = '00'] = (input.value || '09:00').split(':');
+          const minute = hour.dataset.pickerHour === '24' ? '00' : currentMinute;
+          setTimeValue(widget.dataset.input, `${hour.dataset.pickerHour}:${minute}`);
+          renderTimePicker(widget);
+          widget.querySelector(`[data-picker-hour="${hour.dataset.pickerHour}"]`)?.scrollIntoView({ block: 'center' });
+          return;
+        }
+        const minute = event.target.closest('[data-picker-minute]');
+        if (minute) {
+          const widget = minute.closest('[data-time-picker]');
+          const input = $(`#${widget.dataset.input}`);
+          const [currentHour = '09'] = (input.value || '09:00').split(':');
+          setTimeValue(widget.dataset.input, `${currentHour}:${minute.dataset.pickerMinute}`);
+          renderTimePicker(widget);
+          widget.querySelector(`[data-picker-minute="${minute.dataset.pickerMinute}"]`)?.scrollIntoView({ block: 'center' });
+          return;
+        }
         if (!event.target.closest('.picker-control')) closePickers();
       });
       document.addEventListener('keydown', event => {
@@ -986,6 +1122,7 @@
       $$('input[name="kind"]', $('#slot-form')).forEach(input => input.addEventListener('change', updateSlotFormKind));
 
       $('#calendar-body').addEventListener('click', event => {
+        if (Date.now() < suppressCalendarClickUntil) { event.preventDefault(); return; }
         const book = event.target.closest('[data-book]');
         const edit = event.target.closest('[data-edit]');
         const pending = event.target.closest('[data-open-requests]');

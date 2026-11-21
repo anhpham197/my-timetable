@@ -4,11 +4,14 @@ import assert from 'node:assert/strict';
 import {
   DAY_END_MINUTE,
   DAY_START_MINUTE,
+  draggedMinuteRange,
+  formatScheduleTimestamp,
   monthCalendarDates,
   nextRequestWindow,
   rangesOverlap,
   timeMinutes,
-  timeOptions,
+  timePickerHours,
+  timePickerMinutes,
   validateRequestContact,
   validateTimeRange
 } from '../timetable-rules.mjs';
@@ -30,15 +33,33 @@ test('time ranges reject invalid clocks, empty durations, and 24:00 starts', () 
   assert.equal(validateTimeRange('08:15', '09:00'), true);
 });
 
-test('time pickers include all half hours and midnight as an end time', () => {
-  const starts = timeOptions();
-  const ends = timeOptions({ end: true });
-  assert.equal(starts.length, 48);
-  assert.equal(starts[0], '00:00');
-  assert.equal(starts.at(-1), '23:30');
-  assert.equal(ends.length, 48);
-  assert.equal(ends[0], '00:30');
-  assert.equal(ends.at(-1), '24:00');
+test('time pickers allow every minute, with 24:00 only as an end time', () => {
+  const startHours = timePickerHours();
+  const endHours = timePickerHours({ end: true });
+  const minutes = timePickerMinutes();
+  assert.equal(startHours.length, 24);
+  assert.equal(startHours[0], '00');
+  assert.equal(startHours.at(-1), '23');
+  assert.equal(endHours.length, 25);
+  assert.equal(endHours.at(-1), '24');
+  assert.equal(minutes.length, 60);
+  assert.equal(minutes[0], '00');
+  assert.equal(minutes.at(-1), '59');
+  assert.equal(validateTimeRange('16:01', '16:02'), true);
+  assert.equal(validateTimeRange('23:59', '24:00'), true);
+});
+
+test('dragged ranges work in either direction and stop at the day boundary', () => {
+  assert.deepEqual(draggedMinuteRange(600, 615), { start: 600, end: 615 });
+  assert.deepEqual(draggedMinuteRange(615, 600), { start: 600, end: 615 });
+  assert.deepEqual(draggedMinuteRange(600, 600), { start: 600, end: 601 });
+  assert.deepEqual(draggedMinuteRange(1439, 1440), { start: 1439, end: 1440 });
+  assert.deepEqual(draggedMinuteRange(1439, 2000), { start: 1439, end: 1440 });
+});
+
+test('full timestamps use the requested GMT+7 wall-clock format, including midnight rollover', () => {
+  assert.equal(formatScheduleTimestamp('2026-11-21', '16:01'), 'Sat 21 Nov 16:01:00 GMT+7');
+  assert.equal(formatScheduleTimestamp('2026-11-21', '24:00'), 'Sun 22 Nov 00:00:00 GMT+7');
 });
 
 test('date picker months align Monday first and include leap days', () => {
