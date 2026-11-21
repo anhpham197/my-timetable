@@ -165,9 +165,21 @@
     .status-pill { color: #9c6c18; background: #fff2d7; padding: 3px 7px; border-radius: 20px; font-size: 8px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
     .request-time { margin-top: 8px; color: #57647b; font-size: 10px; font-weight: 600; }
     .request-note { margin: 7px 0 0; color: #8590a0; font-size: 10px; line-height: 1.5; }
-    .request-visibility { display: grid; gap: 5px; margin-top: 11px; max-width: 280px; color: #758197; font-size: 9px; font-weight: 650; }
-    .request-visibility select { width: 100%; min-height: 31px; padding: 5px 8px; border: 1px solid #e0e5ed; border-radius: 7px; color: #526078; background: #fff; font: inherit; font-weight: 550; }
-    .request-actions { display: flex; gap: 7px; align-self: center; }
+    .request-visibility { position: relative; display: grid; gap: 5px; margin-top: 11px; max-width: 280px; color: #758197; font-size: 9px; font-weight: 650; }
+    .request-visibility-trigger { width: 100%; min-height: 32px; display: flex; justify-content: space-between; align-items: center; gap: 9px; padding: 5px 9px; border: 1px solid #e0e5ed; border-radius: 7px; color: #526078; background: #fff; font: inherit; font-size: 9px; font-weight: 600; text-align: left; transition: border-color .18s, box-shadow .18s, background .18s; }
+    .request-visibility-trigger:hover { border-color: #d5a4b3; background: #fffdfd; }
+    .request-visibility-trigger:focus-visible, .request-visibility-trigger[aria-expanded="true"] { outline: 0; border-color: #a83a5a; box-shadow: 0 0 0 3px rgba(141,41,71,.1); }
+    .request-visibility-trigger svg { width: 13px; height: 13px; flex: none; color: #8d2947; transition: transform .16s; }
+    .request-visibility-trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+    .request-visibility-options { position: absolute; top: calc(100% + 6px); left: 0; z-index: 12; width: 100%; display: grid; gap: 3px; padding: 5px; border: 1px solid #ebe3e6; border-radius: 9px; background: #fff; box-shadow: 0 10px 24px rgba(62,27,44,.14); animation: picker-open .14s ease both; }
+    .request-visibility-options[hidden] { display: none; }
+    .request-visibility-option { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 31px; padding: 5px 8px; border: 1px solid transparent; border-radius: 6px; color: #526078; background: #fff; font: inherit; font-size: 9px; font-weight: 550; text-align: left; }
+    .request-visibility-option::before { content: ''; display: grid; place-items: center; width: 12px; height: 12px; flex: none; font-size: 10px; font-weight: 800; }
+    .request-visibility-option:hover, .request-visibility-option:focus-visible { outline: 0; border-color: #f0dce3; background: #fcf6f8; color: #8d2947; }
+    .request-visibility-option[aria-pressed="true"] { border-color: #8d2947; background: #8d2947; color: #fff; box-shadow: 0 3px 7px rgba(141,41,71,.16); font-weight: 700; }
+    .request-visibility-option[aria-pressed="true"]::before { content: '✓'; }
+    .request-visibility-option svg { width: 12px; height: 12px; flex: none; }
+    .request-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; align-self: center; }
     .request-actions .button { height: 31px; padding: 0 10px; font-size: 9px; }
     .request-actions .button.primary { background: #28846b; border-color: #28846b; box-shadow: none; }
     .request-actions .button.primary:hover { background: #1d725a; }
@@ -242,8 +254,6 @@
     .time-option.selected { border-color: #b55a75; background: #8d2947; color: white; box-shadow: 0 3px 7px rgba(141,41,71,.16); }
     .time-option:disabled { opacity: .35; cursor: default; }
     .picker-hint { margin: 8px 2px 0; color: #9a8e94; font-size: 8px; }
-    .picker-range-preview { margin: 8px 0 0; padding: 8px 10px; border: 1px solid #eee3e8; border-radius: 8px; color: #764052; background: #fcf8fa; font-size: 9px; line-height: 1.5; font-variant-numeric: tabular-nums; white-space: pre-line; }
-    .picker-range-preview:empty { display: none; }
     .type-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .type-option { position: relative; }
     .type-option input { position: absolute; opacity: 0; pointer-events: none; }
@@ -252,8 +262,6 @@
     .type-option strong svg { width: 13px; height: 13px; }
     .type-option span { display: block; color: #9099a8; font-size: 8px; margin-top: 5px; line-height: 1.4; font-weight: 450; }
     .type-option input:checked + label { border-color: #d29aab; background: #fcf6f8; box-shadow: 0 0 0 2px rgba(141,41,71,.08); }
-    .availability-switch { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 9px 0 0; padding: 9px 10px; border: 1px solid #eee5e9; border-radius: 8px; color: #7f899a; background: #fcfafb; font-size: 9px; }
-    .availability-switch .button { height: 30px; padding: 0 10px; font-size: 9px; }
     .visibility-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .visibility-option { position: relative; }
     .visibility-option input { position: absolute; opacity: 0; pointer-events: none; }
@@ -369,7 +377,7 @@
             <div class="toolbar-right"><button class="today-button" id="today-button">Today</button><select class="view-picker" aria-label="Calendar range" disabled><option>Week</option></select></div>
           </div>
           <div class="calendar-scroll" tabindex="0" role="region" aria-label="Full-day weekly calendar. Scroll to view more hours and days."><div class="calendar-min-width"><div class="day-head" id="day-head"></div><div class="calendar-body" id="calendar-body"></div></div></div>
-          <div class="calendar-footer"><div class="legend" id="legend"><span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span></div><span>Times shown in GMT+7</span></div>
+          <div class="calendar-footer"><div class="legend" id="legend"><span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span><span class="legend-item"><i class="legend-swatch pending"></i>Pending request</span></div><span>Times shown in GMT+7</span></div>
         </div>
       </section>
 
@@ -393,17 +401,16 @@
           <div class="type-option"><input type="radio" name="eventType" value="personal" id="event-type-personal" checked><label for="event-type-personal"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M8 3v4m8-4v4M4 10h16"/></svg>Personal time</strong><span>Activities just for you, such as badminton or guitar.</span></label></div>
           <div class="type-option"><input type="radio" name="eventType" value="meeting" id="event-type-meeting"><label for="event-type-meeting"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3.5 20c.2-3.6 2.1-5.4 5.5-5.4s5.3 1.8 5.5 5.4m.4-5c3.1-.3 5.1 1.4 5.6 4.6"/></svg>Meeting with others</strong><span>Plans with friends or other people.</span></label></div>
         </div></div>
-        <div class="availability-switch" id="availability-switch"><span id="availability-switch-copy">Want people to request this time?</span><button class="button" type="button" id="toggle-slot-mode">Open for booking</button></div>
         <div class="form-grid">
           <div class="field full" id="slot-title-field"><label id="slot-name-label" for="slot-title">Activity name</label><input id="slot-title" name="title" maxlength="60" placeholder="e.g. Badminton" required /></div>
+          <div class="field full" id="slot-description-field"><label for="slot-description">Description</label><textarea id="slot-description" name="description" maxlength="300" rows="3"></textarea></div>
           <div class="field full"><label for="slot-date-picker-button">Date</label><div class="picker-control date-picker" id="slot-date-picker" data-date-picker data-input="slot-date"><input type="hidden" id="slot-date" name="date" /><button class="picker-trigger" id="slot-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div>
           <div class="field"><label for="slot-start-picker-button">Starts</label><div class="picker-control time-picker" id="slot-start-picker" data-time-picker data-input="slot-start" data-end="false"><input type="hidden" id="slot-start" name="start" /><button class="picker-trigger" id="slot-start-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div>
           <div class="field"><label for="slot-end-picker-button">Ends</label><div class="picker-control time-picker" id="slot-end-picker" data-time-picker data-input="slot-end" data-end="true"><input type="hidden" id="slot-end" name="end" /><button class="picker-trigger" id="slot-end-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div>
-          <p class="picker-range-preview field full" id="slot-range-preview" role="status" aria-live="polite"></p>
           <div class="field full" id="visibility-field"><label>Who can see this slot?</label><div class="visibility-options">
             <div class="visibility-option"><input type="radio" name="visibility" value="public" id="visibility-public" checked><label for="visibility-public"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18m0-18a14 14 0 0 0 0 18"/></svg><span><strong>Public</strong><span>Others can see the name</span></span></label></div>
             <div class="visibility-option"><input type="radio" name="visibility" value="private" id="visibility-private"><label for="visibility-private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg><span><strong>Private</strong><span>Others only see unavailable</span></span></label></div>
-          </div><p class="privacy-help">Open booking times are visible to visitors. Personal time blocks prevent overlapping requests.</p></div>
+          </div><p class="privacy-help">Private time slots only appear as unavailable to visitors.</p></div>
         </div>
         <p class="modal-error" id="slot-error" role="alert" aria-live="polite"></p>
         <div class="modal-actions"><button class="button danger" type="button" id="delete-slot" hidden>Delete slot</button><div class="right-actions"><button class="button" type="button" data-close="slot-modal-backdrop">Cancel</button><button class="button primary" type="submit" id="save-slot">Save slot</button></div></div>
@@ -415,9 +422,31 @@
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
       <div class="modal-head"><div><h2 id="booking-modal-title">Request this time</h2><p id="booking-slot-copy">No account needed. Add your name, phone, and a short message; email is optional.</p></div><button class="close-button" data-close="booking-modal-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
       <form id="booking-form" novalidate><input type="hidden" name="slotId" id="booking-slot-id" />
-        <div class="form-grid" id="booking-time-fields" style="display:none"><div class="field full"><label for="booking-date-picker-button">Requested date</label><div class="picker-control date-picker" id="booking-date-picker" data-date-picker data-input="booking-date"><input type="hidden" id="booking-date" name="requestDate" /><button class="picker-trigger" id="booking-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-start-picker-button">Starts</label><div class="picker-control time-picker" id="booking-start-picker" data-time-picker data-input="booking-start" data-end="false"><input type="hidden" id="booking-start" name="requestStart" /><button class="picker-trigger" id="booking-start-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-end-picker-button">Ends</label><div class="picker-control time-picker" id="booking-end-picker" data-time-picker data-input="booking-end" data-end="true"><input type="hidden" id="booking-end" name="requestEnd" /><button class="picker-trigger" id="booking-end-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div><p class="picker-range-preview field full" id="booking-range-preview" role="status" aria-live="polite"></p></div>
+        <div class="form-grid" id="booking-time-fields" style="display:none"><div class="field full"><label for="booking-date-picker-button">Requested date</label><div class="picker-control date-picker" id="booking-date-picker" data-date-picker data-input="booking-date"><input type="hidden" id="booking-date" name="requestDate" /><button class="picker-trigger" id="booking-date-picker-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-start-picker-button">Starts</label><div class="picker-control time-picker" id="booking-start-picker" data-time-picker data-input="booking-start" data-end="false"><input type="hidden" id="booking-start" name="requestStart" /><button class="picker-trigger" id="booking-start-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div><div class="field"><label for="booking-end-picker-button">Ends</label><div class="picker-control time-picker" id="booking-end-picker" data-time-picker data-input="booking-end" data-end="true"><input type="hidden" id="booking-end" name="requestEnd" /><button class="picker-trigger" id="booking-end-picker-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div></div>
         <div class="form-grid" style="margin-top:13px"><div class="field full"><label for="booker-name">Your name</label><input id="booker-name" name="name" autocomplete="name" maxlength="60" required /></div><div class="field full"><label for="booker-phone">Your phone</label><input id="booker-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" minlength="7" maxlength="32" required /></div><div class="field full"><label for="booker-email">Email <span class="optional-label">(optional)</span></label><input id="booker-email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="you@example.com" /></div><div class="field full"><label for="booking-note">Short message</label><textarea id="booking-note" name="note" maxlength="300" required placeholder="What would you like to discuss? (up to 300 characters)"></textarea></div></div>
         <p class="modal-error" id="booking-error" role="alert" aria-live="polite"></p><div class="modal-actions"><span></span><div class="right-actions"><button class="button" type="button" data-close="booking-modal-backdrop">Cancel</button><button class="button primary" type="submit">Send request</button></div></div>
+      </form>
+    </section>
+  </div>
+  <div class="modal-backdrop" id="request-edit-backdrop" role="presentation">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="request-edit-title">
+      <div class="modal-head"><div><h2 id="request-edit-title">Edit booking request</h2><p>Update the request details or move it to a different time.</p></div><button class="close-button" data-close="request-edit-backdrop" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
+      <form id="request-edit-form" novalidate>
+        <div class="form-grid">
+          <div class="field full"><label for="request-edit-date-button">Date</label><div class="picker-control date-picker" data-date-picker data-input="request-edit-date"><input type="hidden" id="request-edit-date" name="date" /><button class="picker-trigger" id="request-edit-date-button" type="button" data-picker-trigger aria-haspopup="dialog" aria-expanded="false"><span data-picker-label class="placeholder">Choose a date</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3v4m9-4v4M4 9.5h16"/></svg></button><div class="picker-panel date-picker-panel" data-picker-panel hidden></div></div></div>
+          <div class="field"><label for="request-edit-start-button">Starts</label><div class="picker-control time-picker" data-time-picker data-input="request-edit-start" data-end="false"><input type="hidden" id="request-edit-start" name="start" /><button class="picker-trigger" id="request-edit-start-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div>
+          <div class="field"><label for="request-edit-end-button">Ends</label><div class="picker-control time-picker" data-time-picker data-input="request-edit-end" data-end="true"><input type="hidden" id="request-edit-end" name="end" /><button class="picker-trigger" id="request-edit-end-button" type="button" data-picker-trigger aria-haspopup="listbox" aria-expanded="false"><span data-picker-label></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button><div class="picker-panel time-picker-panel" data-picker-panel hidden></div></div></div>
+          <div class="field full"><label for="request-edit-name">Name</label><input id="request-edit-name" name="name" maxlength="60" required /></div>
+          <div class="field full"><label for="request-edit-phone">Phone</label><input id="request-edit-phone" name="phone" type="tel" inputmode="tel" minlength="7" maxlength="32" required /></div>
+          <div class="field full"><label for="request-edit-email">Email <span class="optional-label">(optional)</span></label><input id="request-edit-email" name="email" type="email" maxlength="120" /></div>
+          <div class="field full"><label for="request-edit-note">Short message</label><textarea id="request-edit-note" name="note" maxlength="300" required></textarea></div>
+          <div class="field full"><label>Visitor visibility</label><div class="visibility-options">
+            <div class="visibility-option"><input type="radio" name="requestVisibility" value="public" id="request-edit-visibility-public" /><label for="request-edit-visibility-public"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18m0-18a14 14 0 0 0 0 18"/></svg><span><strong>Public</strong><span>Show the visitor’s name</span></span></label></div>
+            <div class="visibility-option"><input type="radio" name="requestVisibility" value="private" id="request-edit-visibility-private" /><label for="request-edit-visibility-private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg><span><strong>Private</strong><span>Show as unavailable</span></span></label></div>
+          </div></div>
+        </div>
+        <p class="modal-error" id="request-edit-error" role="alert" aria-live="polite"></p>
+        <div class="modal-actions"><span></span><div class="right-actions"><button class="button" type="button" data-close="request-edit-backdrop">Cancel</button><button class="button primary" id="save-request-edit" type="submit">Save changes</button></div></div>
       </form>
     </section>
   </div>
@@ -451,6 +480,7 @@
       let applyingSession = 0;
       let persistedSlotIds = new Set();
       let editingSlotId = null;
+      let editingRequestId = null;
       let snackbarTimer;
       let inboxPollTimer;
       let bookingTargetId = null;
@@ -469,8 +499,8 @@
         setTimeout(updateHeaderClock, 1000 - now.getMilliseconds() + 20);
       }
       const dbTime = value => String(value || '').slice(0, 5);
-      const slotFromRow = row => ({ id: row.id, kind: row.kind, eventType: normalizeSlotEventType(row.kind, row.event_type), title: row.title, date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility });
-      const slotToRow = slot => ({ id: slot.id, kind: slot.kind, event_type: normalizeSlotEventType(slot.kind, slot.eventType), title: slot.title, slot_date: slot.date, start_time: slot.start, end_time: slot.end, visibility: slot.visibility });
+      const slotFromRow = row => ({ id: row.id, kind: row.kind, eventType: normalizeSlotEventType(row.kind, row.event_type), title: row.title, description: row.description || '', date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility });
+      const slotToRow = slot => ({ id: slot.id, kind: slot.kind, event_type: normalizeSlotEventType(slot.kind, slot.eventType), title: slot.title, description: slot.description || '', slot_date: slot.date, start_time: slot.start, end_time: slot.end, visibility: slot.visibility });
       const requestFromRow = row => ({ id: row.id, slotId: row.slot_id, availabilityTitle: row.availability_title, name: row.name, phone: row.phone || '', email: row.email || '', note: row.note || '', date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), status: row.status, visibility: row.visibility === 'public' ? 'public' : 'private', createdAt: row.created_at });
       const save = async () => {
         if (!supabase || !ownerAuthenticated || !ownerView) return false;
@@ -546,7 +576,7 @@
           state = cleanState({});
           setConnectionNotice('Booking service needs setup', 'The timetable backend is configured but could not load public availability. Apply the included database schema and check your Supabase settings.');
         } else {
-          state = cleanState({ slots: (data || []).map(row => ({ id: row.id, kind: row.kind, title: row.title, date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility })), requests: [] });
+          state = cleanState({ slots: (data || []).map(row => ({ id: row.id, kind: row.kind, title: row.title, description: row.description || '', date: row.slot_date, start: dbTime(row.start_time), end: dbTime(row.end_time), visibility: row.visibility })), requests: [] });
           setConnectionNotice('', '', false);
         }
         renderCalendar();
@@ -618,7 +648,6 @@
         label.textContent = value ? fromKey(value).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'Choose a date';
         label.classList.toggle('placeholder', !value);
         input.dispatchEvent(new Event('change', { bubbles: true }));
-        updateRangePreview(inputId.startsWith('slot-') ? 'slot' : 'booking');
       }
       function setTimeValue(inputId, value) {
         const input = $(`#${inputId}`), widget = $(`[data-time-picker][data-input="${inputId}"]`);
@@ -626,17 +655,6 @@
         const label = $('[data-picker-label]', widget);
         label.textContent = value ? pickerTimeLabel(value) : 'Choose a time';
         label.classList.toggle('placeholder', !value);
-        updateRangePreview(inputId.startsWith('slot-') ? 'slot' : 'booking');
-      }
-      function updateRangePreview(prefix) {
-        const preview = $(`#${prefix}-range-preview`);
-        if (!preview) return;
-        const date = $(`#${prefix}-date`).value;
-        const start = $(`#${prefix}-start`).value;
-        const end = $(`#${prefix}-end`).value;
-        preview.textContent = date && start && end
-          ? `Starts: ${formatScheduleTimestamp(date, start)}\nEnds: ${formatScheduleTimestamp(date, end)}`
-          : '';
       }
       function renderDatePicker(widget) {
         const input = $(`#${widget.dataset.input}`);
@@ -796,8 +814,9 @@
             const dataAttrs = clickable ? `data-book="${item.id}"` : (editable ? `data-edit="${item.id}"` : item.kind === 'pending' && !visitorMode ? 'data-open-requests="true"' : '');
             const compactClass = metrics.compact ? 'compact' : metrics.short ? 'short' : '';
             const pendingOwnerEvent = item.kind === 'pending' && !visitorMode;
-            const eventTitle = pendingOwnerEvent ? 'Pending request · Select to review' : `${info.title} · ${info.sub}`;
-            const eventLabel = pendingOwnerEvent ? 'Pending request. Select to review.' : `${info.title}, ${info.sub}`;
+            const description = item.kind === 'event' && (!visitorMode || item.visibility === 'public') ? String(item.description || '').trim() : '';
+            const eventTitle = pendingOwnerEvent ? 'Pending request · Select to review' : [info.title, description, info.sub].filter(Boolean).join(' · ');
+            const eventLabel = pendingOwnerEvent ? 'Pending request. Select to review.' : [info.title, description, info.sub].filter(Boolean).join(', ');
             body += `<article class="calendar-event ${extra} ${compactClass} ${clickable ? 'public-view' : ''}" style="top:${styleTop}px;height:${styleHeight}px" ${dataAttrs} tabindex="${clickable || editable || item.kind === 'pending' && !visitorMode ? '0' : '-1'}" title="${escapeHtml(eventTitle)}" aria-label="${escapeHtml(eventLabel)}"><strong>${escapeHtml(info.title)}</strong><span>${escapeHtml(info.sub)}</span></article>`;
           }
           const now = new Date();
@@ -813,7 +832,7 @@
         const weekSlots = state.slots.filter(slot => dates.some(d => dateKey(d) === slot.date) && !(slot.kind === 'availability' && state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))));
         $('#stat-slots').textContent = String(weekSlots.length + state.requests.filter(r => r.status === 'accepted' && dates.some(d => dateKey(d) === r.date)).length);
         $('#stat-open').textContent = String(state.slots.filter(slot => slot.kind === 'availability' && dates.some(d => dateKey(d) === slot.date) && !state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))).length);
-        $('#legend').innerHTML = visitorMode ? '<span class="legend-item"><i class="legend-swatch private"></i>Unavailable</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span><span class="legend-item"><i class="legend-swatch pending"></i>Pending request</span>' : '<span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch available"></i>Available to book</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span><span class="legend-item"><i class="legend-swatch pending"></i>Pending request</span>';
+        $('#legend').innerHTML = visitorMode ? '<span class="legend-item"><i class="legend-swatch private"></i>Unavailable</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span><span class="legend-item"><i class="legend-swatch pending"></i>Pending request</span>' : '<span class="legend-item"><i class="legend-swatch public"></i>Public event</span><span class="legend-item"><i class="legend-swatch private"></i>Private</span><span class="legend-item"><i class="legend-swatch booking"></i>Booked</span><span class="legend-item"><i class="legend-swatch pending"></i>Pending request</span>';
         updateRequestCounts();
       }
       const minuteToClock = minute => `${String(Math.floor(minute / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`;
@@ -873,11 +892,13 @@
       }
       function requestCard(request, confirmed = false) {
         const status = confirmed ? '<span class="status-pill" style="color:#36816d;background:#e8f6f1">Confirmed</span>' : '<span class="status-pill">Awaiting response</span>';
-        const actions = confirmed ? `<div class="request-actions"><button class="button danger" data-cancel-booking="${request.id}">Cancel booking</button></div>` : `<div class="request-actions"><button class="button" data-decline="${request.id}">Decline</button><button class="button primary" data-accept="${request.id}">Accept</button></div>`;
+        const editAction = `<button class="button" data-edit-request="${request.id}">Edit</button>`;
+        const actions = confirmed ? `<div class="request-actions">${editAction}<button class="button danger" data-cancel-booking="${request.id}">Cancel booking</button></div>` : `<div class="request-actions">${editAction}<button class="button" data-decline="${request.id}">Decline</button><button class="button primary" data-accept="${request.id}">Accept</button></div>`;
         const contact = `<p class="request-note">Phone: ${escapeHtml(request.phone || 'Not provided')}</p>${request.email ? `<p class="request-note">Email: ${escapeHtml(request.email)}</p>` : ''}`;
         const note = request.note ? `<p class="request-note">“${escapeHtml(request.note)}”</p>` : '';
         const visibility = request.visibility === 'public' ? 'public' : 'private';
-        const visibilityControl = `<label class="request-visibility"><span>Visitor visibility</span><select data-request-visibility="${request.id}" aria-label="Visitor visibility for ${escapeHtml(request.name)}"><option value="private" ${visibility === 'private' ? 'selected' : ''}>Private · show as Unavailable</option><option value="public" ${visibility === 'public' ? 'selected' : ''}>Public · show name</option></select></label>`;
+        const visibilityLabel = visibility === 'public' ? 'Public · show name' : 'Private · show as Unavailable';
+        const visibilityControl = `<div class="request-visibility"><span>Visitor visibility</span><button class="request-visibility-trigger" type="button" data-request-visibility-trigger="${request.id}" aria-controls="request-visibility-${request.id}" aria-expanded="false"><span>${visibilityLabel}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 10 5 5 5-5"/></svg></button><div class="request-visibility-options" id="request-visibility-${request.id}" role="group" aria-label="Choose visitor visibility" hidden><button class="request-visibility-option" type="button" data-request-id="${request.id}" data-request-visibility-option="private" aria-pressed="${visibility === 'private'}"><span>Private · show as Unavailable</span></button><button class="request-visibility-option" type="button" data-request-id="${request.id}" data-request-visibility-option="public" aria-pressed="${visibility === 'public'}"><span>Public · show name</span></button></div></div>`;
         return `<article class="request-card"><div class="avatar"><span aria-hidden="true">${escapeHtml(initials(request.name))}</span><img class="avatar-gif" src="${requestAvatarGif(request.id)}" alt="" aria-hidden="true" loading="lazy" /></div><div><div class="request-meta"><strong>${escapeHtml(request.name)}</strong>${status}</div><div class="request-time">${escapeHtml(timestampRange(request.date, request.start, request.end))}</div>${contact}${note}${visibilityControl}</div>${actions}</article>`;
       }
       function renderRequests() {
@@ -886,6 +907,34 @@
         $('#pending-list').innerHTML = pending.length ? pending.map(r => requestCard(r)).join('') : `<div class="empty-state"><div class="empty-state-icon">${icon('lock')}</div><h2>All caught up</h2><p>New booking requests will show up here. You choose which ones make it onto your timetable.</p></div>`;
         $('#confirmed-list').innerHTML = confirmed.length ? confirmed.map(r => requestCard(r, true)).join('') : `<div class="empty-state" style="padding:30px 18px"><div class="empty-state-icon">${icon('plus')}</div><h2>No confirmed bookings yet</h2><p>Accepted requests will appear here and on your timetable.</p></div>`;
         updateRequestCounts();
+      }
+      function closeRequestVisibilityMenus(except = null) {
+        $$('.request-visibility').forEach(menu => {
+          if (menu === except) return;
+          const panel = $('.request-visibility-options', menu);
+          const trigger = $('.request-visibility-trigger', menu);
+          panel.hidden = true;
+          trigger.setAttribute('aria-expanded', 'false');
+        });
+      }
+      async function updateRequestVisibility(requestId, visibility) {
+        const request = state.requests.find(item => item.id === requestId);
+        if (!request) return;
+        closeRequestVisibilityMenus();
+        const previous = request.visibility === 'public' ? 'public' : 'private';
+        const next = visibility === 'public' ? 'public' : 'private';
+        if (previous === next) return;
+        request.visibility = next;
+        renderRequests();
+        const { error } = await supabase.from('booking_requests').update({ visibility: next }).eq('id', request.id);
+        if (error) {
+          console.error('Booking visibility update failed', error);
+          toast('Could not update visitor visibility. Please try again.');
+          await loadOwnerData();
+          return;
+        }
+        renderCalendar();
+        toast(`Meeting set to ${next}`);
       }
       function setPage(page) {
         const isRequests = page === 'requests';
@@ -937,6 +986,7 @@
         setTimeValue('slot-start', slot?.start || '09:00');
         setTimeValue('slot-end', slot?.end || '10:00');
         $('#slot-title').value = slot?.title || '';
+        $('#slot-description').value = slot?.description || '';
         $('#slot-kind').value = kind;
         $(`input[name="eventType"][value="${slot?.eventType || 'personal'}"]`).checked = true;
         $(`input[name="visibility"][value="${slot?.visibility || 'public'}"]`).checked = true;
@@ -949,10 +999,9 @@
         const eventType = $('input[name="eventType"]:checked', $('#slot-form')).value;
         $('#slot-type-field').style.display = availability ? 'none' : 'grid';
         $('#slot-title-field').style.display = availability ? 'none' : 'grid';
+        $('#slot-description-field').style.display = availability ? 'none' : 'grid';
         $('#slot-title').required = !availability;
         $('#visibility-field').style.display = availability ? 'none' : 'grid';
-        $('#availability-switch-copy').textContent = availability ? 'Adding your own activity or meeting?' : 'Want people to request this time?';
-        $('#toggle-slot-mode').textContent = availability ? 'Back to time slot' : 'Open for booking';
         $('#slot-name-label').textContent = eventType === 'meeting' ? 'Meeting name' : 'Activity name';
         $('#slot-title').placeholder = eventType === 'meeting' ? 'e.g. Coffee with Mai' : 'e.g. Badminton';
         if (availability) $('#slot-title').value = '';
@@ -979,7 +1028,28 @@
         $('#booking-modal-backdrop').classList.add('open');
         setTimeout(() => $('#booker-name').focus(), 40);
       }
-      function closeModal(id) { closePickers(); $(`#${id}`).classList.remove('open'); }
+      function openRequestEditModal(request) {
+        if (!ownerView || !request || (!isPending(request) && !isConfirmed(request))) return;
+        editingRequestId = request.id;
+        closePickers();
+        $('#request-edit-form').reset();
+        $('#request-edit-error').classList.remove('show');
+        setDateValue('request-edit-date', request.date);
+        setTimeValue('request-edit-start', request.start);
+        setTimeValue('request-edit-end', request.end);
+        $('#request-edit-name').value = request.name || '';
+        $('#request-edit-phone').value = request.phone || '';
+        $('#request-edit-email').value = request.email || '';
+        $('#request-edit-note').value = request.note || '';
+        $(`input[name="requestVisibility"][value="${request.visibility === 'public' ? 'public' : 'private'}"]`).checked = true;
+        $('#request-edit-backdrop').classList.add('open');
+        setTimeout(() => $('#request-edit-name').focus(), 40);
+      }
+      function closeModal(id) {
+        closePickers();
+        $(`#${id}`).classList.remove('open');
+        if (id === 'request-edit-backdrop') editingRequestId = null;
+      }
       function showError(selector, message, focusTarget = null) {
         const el = $(selector); el.textContent = message; el.classList.add('show');
         if (focusTarget) $(focusTarget)?.focus();
@@ -1075,10 +1145,6 @@
       $('#today-button').addEventListener('click', () => { week = startOfWeek(new Date()); renderCalendar(); });
       $('#add-slot').addEventListener('click', () => openSlotModal());
       $('#guest-request').addEventListener('click', () => openBookingModal());
-      $('#toggle-slot-mode').addEventListener('click', () => {
-        $('#slot-kind').value = $('#slot-kind').value === 'availability' ? 'event' : 'availability';
-        updateSlotFormKind();
-      });
       $('#owner-mode').addEventListener('click', () => setVisitorMode(false));
       $('#visitor-mode').addEventListener('click', () => setVisitorMode(true));
       $('#auth-button').addEventListener('click', async () => {
@@ -1092,7 +1158,7 @@
       $('#nav-requests').addEventListener('click', () => setPage('requests'));
       $('#requests-back').addEventListener('click', () => setPage('calendar'));
       $$('[data-close]').forEach(button => button.addEventListener('click', () => closeModal(button.dataset.close)));
-      $$('.modal-backdrop').forEach(backdrop => backdrop.addEventListener('click', event => { if (event.target === backdrop) { closePickers(); backdrop.classList.remove('open'); } }));
+      $$('.modal-backdrop').forEach(backdrop => backdrop.addEventListener('click', event => { if (event.target === backdrop) closeModal(backdrop.id); }));
       $('#calendar-body').addEventListener('pointerdown', event => {
         const column = event.target.closest('.day-column');
         if (!$('#calendar-body').classList.contains('requestable') || !column || event.target.closest('.calendar-event') || event.button !== 0) return;
@@ -1125,6 +1191,24 @@
         if (dragSelection?.pointerId === event.pointerId) finishDragSelection(false);
       });
       document.addEventListener('click', event => {
+        const visibilityTrigger = event.target.closest('[data-request-visibility-trigger]');
+        if (visibilityTrigger) {
+          const menu = visibilityTrigger.closest('.request-visibility');
+          const panel = $('.request-visibility-options', menu);
+          const wasOpen = !panel.hidden;
+          closeRequestVisibilityMenus();
+          if (!wasOpen) {
+            panel.hidden = false;
+            visibilityTrigger.setAttribute('aria-expanded', 'true');
+          }
+          return;
+        }
+        const visibilityOption = event.target.closest('[data-request-visibility-option]');
+        if (visibilityOption) {
+          void updateRequestVisibility(visibilityOption.dataset.requestId, visibilityOption.dataset.requestVisibilityOption);
+          return;
+        }
+        if (!event.target.closest('.request-visibility')) closeRequestVisibilityMenus();
         const trigger = event.target.closest('[data-picker-trigger]');
         if (trigger) { togglePicker(trigger.closest('.picker-control')); return; }
         const navigation = event.target.closest('[data-calendar-nav]');
@@ -1158,10 +1242,18 @@
       });
       document.addEventListener('keydown', event => {
         if (event.key !== 'Escape') return;
+        const openVisibilityPanel = $('.request-visibility-options:not([hidden])');
+        if (openVisibilityPanel) {
+          const trigger = $('.request-visibility-trigger', openVisibilityPanel.parentElement);
+          closeRequestVisibilityMenus();
+          trigger.focus();
+          event.preventDefault();
+          return;
+        }
         const openPanel = $('[data-picker-panel]:not([hidden])');
         if (openPanel) { closePickers(); event.preventDefault(); return; }
         closePickers();
-        $$('.modal-backdrop.open').forEach(backdrop => backdrop.classList.remove('open'));
+        $$('.modal-backdrop.open').forEach(backdrop => closeModal(backdrop.id));
       });
       $$('input[name="eventType"]', $('#slot-form')).forEach(input => input.addEventListener('change', updateSlotFormKind));
 
@@ -1182,7 +1274,7 @@
         const selection = resolveSlotSelection($('#slot-kind').value === 'availability' ? 'availability' : form.get('eventType'));
         if (!selection) { showError('#slot-error', 'Choose a valid slot type.'); return; }
         const { kind, eventType } = selection;
-        const slot = { id: editingSlotId || uid(), kind, eventType, title: kind === 'availability' ? 'Open for booking' : String(form.get('title')).trim(), date: form.get('date'), start: form.get('start'), end: form.get('end'), visibility: kind === 'availability' ? 'public' : form.get('visibility') };
+        const slot = { id: editingSlotId || uid(), kind, eventType, title: kind === 'availability' ? 'Open for booking' : String(form.get('title')).trim(), description: kind === 'availability' ? '' : String(form.get('description') || '').trim(), date: form.get('date'), start: form.get('start'), end: form.get('end'), visibility: kind === 'availability' ? 'public' : form.get('visibility') };
         const error = $('#slot-error'); error.classList.remove('show');
         if (!slot.date) { showError('#slot-error', 'Choose a date for this time slot.', '#slot-date-picker-button'); return; }
         if (!validateTimeRange(slot.start, slot.end)) { showError('#slot-error', 'Choose an end time after the start time.', '#slot-start-picker-button'); return; }
@@ -1238,31 +1330,74 @@
         closeModal('booking-modal-backdrop'); await loadPublicSchedule(); toast('Request sent — waiting for approval');
       });
 
-      document.addEventListener('change', async event => {
-        const select = event.target.closest('[data-request-visibility]');
-        if (!select) return;
-        const request = state.requests.find(item => item.id === select.dataset.requestVisibility);
-        if (!request) return;
-        request.visibility = select.value === 'public' ? 'public' : 'private';
-        const { error } = await supabase.from('booking_requests').update({ visibility: request.visibility }).eq('id', request.id);
-        if (error) {
-          console.error('Booking visibility update failed', error);
-          toast('Could not update visitor visibility. Please try again.');
-          await loadOwnerData();
+      $('#request-edit-form').addEventListener('submit', async event => {
+        event.preventDefault();
+        if (!ownerView || !editingRequestId || !supabase) return;
+        const request = state.requests.find(item => item.id === editingRequestId);
+        if (!request || (!isPending(request) && !isConfirmed(request))) {
+          showError('#request-edit-error', 'This request is no longer available to edit. Refresh the page and try again.');
           return;
         }
-        renderRequests(); renderCalendar();
-        toast(`Meeting set to ${request.visibility}`);
+        const form = new FormData(event.currentTarget);
+        const contact = validateRequestContact({ name: form.get('name'), phone: form.get('phone'), email: form.get('email'), note: form.get('note') });
+        if (!contact.valid) {
+          const focusTarget = contact.error.startsWith('Enter your name') ? '#request-edit-name'
+            : contact.error.startsWith('Enter a valid phone') ? '#request-edit-phone'
+            : contact.error.startsWith('Enter a valid email') ? '#request-edit-email' : '#request-edit-note';
+          showError('#request-edit-error', contact.error, focusTarget);
+          return;
+        }
+        const date = String(form.get('date') || '');
+        const start = String(form.get('start') || '');
+        const end = String(form.get('end') || '');
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { showError('#request-edit-error', 'Choose a date for this request.', '#request-edit-date-button'); return; }
+        if (!validateTimeRange(start, end) || timeMinutes(start) < DAY_START_MINUTE || timeMinutes(end) > DAY_END_MINUTE) {
+          showError('#request-edit-error', 'Choose an end time after the start time, within the same day.', '#request-edit-start-button');
+          return;
+        }
+        const visibility = form.get('requestVisibility') === 'public' ? 'public' : 'private';
+        const saveButton = $('#save-request-edit');
+        saveButton.disabled = true;
+        saveButton.textContent = 'Saving…';
+        $('#request-edit-error').classList.remove('show');
+        try {
+          const { error } = await supabase.rpc('owner_update_booking_request', {
+            p_request_id: request.id,
+            p_name: contact.value.name,
+            p_phone: contact.value.phone,
+            p_email: contact.value.email,
+            p_note: contact.value.note,
+            p_slot_date: date,
+            p_start_time: start,
+            p_end_time: end,
+            p_visibility: visibility
+          });
+          if (error) throw error;
+          closeModal('request-edit-backdrop');
+          const loaded = await loadOwnerData();
+          toast(loaded ? 'Request updated' : 'Request updated. Refresh to see the latest details.');
+        } catch (error) {
+          console.error('Booking request update failed', error);
+          showError('#request-edit-error', error?.message || 'Could not update this request. Please try again.');
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = 'Save changes';
+        }
       });
+
       document.addEventListener('error', event => {
         if (event.target.matches?.('.avatar-gif')) event.target.hidden = true;
       }, true);
 
       document.addEventListener('click', async event => {
+        const editRequest = event.target.closest('[data-edit-request]');
         const accept = event.target.closest('[data-accept]');
         const decline = event.target.closest('[data-decline]');
         const cancel = event.target.closest('[data-cancel-booking]');
-        if (accept) {
+        if (editRequest) {
+          const request = state.requests.find(item => item.id === editRequest.dataset.editRequest);
+          if (request) openRequestEditModal(request);
+        } else if (accept) {
           const request = state.requests.find(r => r.id === accept.dataset.accept && isPending(r));
           if (!request) return;
           if (isPastSlot(request.date, request.start)) { toast('This request is for a time that has already passed.'); return; }
