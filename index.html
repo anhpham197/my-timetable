@@ -115,9 +115,10 @@
     .day-column { position: relative; border-right: 1px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, #f0f2f6 31px, #f0f2f6 32px, transparent 32px, transparent 63px, #e7eaf0 63px, #e7eaf0 64px); }
     .day-column:last-child { border-right: 0; }
     .day-column.past-day { opacity: .48; filter: grayscale(.75) blur(.3px); }
-    .calendar-body.requestable .day-column { cursor: crosshair; touch-action: pan-y; }
+    .calendar-body.drag-selectable .day-column { cursor: crosshair; touch-action: pan-y; }
     .drag-selection-preview { position: absolute; left: 4px; right: 4px; z-index: 4; border: 1px solid #8d2947; border-left-width: 3px; border-radius: 6px; background: rgba(141,41,71,.2); box-shadow: 0 2px 10px rgba(141,41,71,.15); color: #682037; pointer-events: none; padding: 4px 6px; overflow: hidden; font-size: 9px; font-weight: 750; font-variant-numeric: tabular-nums; }
     .drag-selection-preview::after { content: "Release to request"; display: block; margin-top: 2px; font-size: 8px; font-weight: 600; opacity: .78; }
+    .drag-selection-preview[data-mode="owner"]::after { content: "Release to add time slot"; }
     body.dragging-calendar { user-select: none; cursor: crosshair; }
     .day-column.today-column { background-color: #fcfcff; }
     .calendar-event { position: absolute; left: 5px; right: 5px; min-height: 0; overflow: hidden; border-radius: 6px; border-left: 3px solid; padding: 5px 6px 4px; cursor: pointer; z-index: 1; transition: filter .15s, transform .15s; }
@@ -780,7 +781,8 @@
         const dates = weekDates();
         const currentParts = Object.fromEntries(HCMC_CLOCK.formatToParts(new Date()).map(part => [part.type, part.value]));
         const todayKey = `${currentParts.year}-${currentParts.month}-${currentParts.day}`;
-        const requestableCalendar = visitorMode && Boolean(supabase);
+        const requestableCalendar = visitorMode && Boolean(supabase) && !ownerView;
+        const ownerEditableCalendar = ownerView && !visitorMode;
         $('#prev-week').hidden = !canNavigateToPreviousWeek(dateKey(week), dateKey(currentWeek), visitorMode);
         $('#day-head').innerHTML = `<div class="day-head-spacer"></div>` + dates.map(date => {
           const key = dateKey(date), today = key === todayKey, past = isPastDate(key, todayKey);
@@ -836,7 +838,7 @@
           body += '</div>';
         });
         $('#calendar-body').style.height = `${(DAY_END_MINUTE - DAY_START_MINUTE) * PX_PER_MINUTE}px`;
-        $('#calendar-body').classList.toggle('requestable', requestableCalendar && !ownerView);
+        $('#calendar-body').classList.toggle('drag-selectable', requestableCalendar || ownerEditableCalendar);
         $('#calendar-body').innerHTML = body;
         const weekSlots = state.slots.filter(slot => dates.some(d => dateKey(d) === slot.date) && !(slot.kind === 'availability' && state.requests.some(request => request.slotId === slot.id && (isPending(request) || isConfirmed(request)))));
         $('#stat-slots').textContent = String(weekSlots.length + state.requests.filter(r => r.status === 'accepted' && dates.some(d => dateKey(d) === r.date)).length);
@@ -859,6 +861,7 @@
           overlay.setAttribute('aria-hidden', 'true');
           dragSelection.column.append(overlay);
         }
+        overlay.dataset.mode = dragSelection.mode;
         overlay.style.top = `${range.start * PX_PER_MINUTE}px`;
         overlay.style.height = `${Math.max(12, (range.end - range.start) * PX_PER_MINUTE)}px`;
         overlay.textContent = `${minuteToClock(range.start)} – ${minuteToClock(range.end)}`;
@@ -873,7 +876,9 @@
         document.body.classList.remove('dragging-calendar');
         if (openRequest && moved && range.end > range.start) {
           suppressCalendarClickUntil = Date.now() + 300;
-          openBookingModal(null, { date: selection.column.dataset.date, start: minuteToClock(range.start), end: minuteToClock(range.end) });
+          const selectedRange = { date: selection.column.dataset.date, start: minuteToClock(range.start), end: minuteToClock(range.end) };
+          if (selection.mode === 'owner') openSlotModal(null, selectedRange.date, selectedRange);
+          else openBookingModal(null, selectedRange);
         }
       }
       function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -981,7 +986,7 @@
         renderCalendar();
         return true;
       }
-      function openSlotModal(slot = null, date = null) {
+      function openSlotModal(slot = null, date = null, range = null) {
         if (visitorMode || !ownerView) return;
         editingSlotId = slot?.id || null;
         closePickers();
@@ -996,8 +1001,8 @@
         $('#delete-slot').hidden = !slot;
         setDatePickerMin('slot-date');
         setDateValue('slot-date', slot?.date || date || dateKey(new Date()));
-        setTimeValue('slot-start', slot?.start || '09:00');
-        setTimeValue('slot-end', slot?.end || '10:00');
+        setTimeValue('slot-start', slot?.start || range?.start || '09:00');
+        setTimeValue('slot-end', slot?.end || range?.end || '10:00');
         $('#slot-title').value = slot?.title || '';
         $('#slot-description').value = slot?.description || '';
         $('#slot-kind').value = kind;
@@ -1212,11 +1217,12 @@
       $$('.modal-backdrop').forEach(backdrop => backdrop.addEventListener('click', event => { if (event.target === backdrop) closeModal(backdrop.id); }));
       $('#calendar-body').addEventListener('pointerdown', event => {
         const column = event.target.closest('.day-column');
-        if (!$('#calendar-body').classList.contains('requestable') || !column || event.target.closest('.calendar-event') || event.button !== 0) return;
+        const mode = ownerView && !visitorMode ? 'owner' : visitorMode && Boolean(supabase) ? 'visitor' : null;
+        if (!mode || !$('#calendar-body').classList.contains('drag-selectable') || !column || event.target.closest('.calendar-event') || event.button !== 0) return;
         const rect = column.getBoundingClientRect();
         const anchorMinute = Math.max(0, Math.min(DAY_END_MINUTE - 1, Math.floor((event.clientY - rect.top) / PX_PER_MINUTE)));
-        if (isPastSlot(column.dataset.date, minuteToClock(anchorMinute))) return;
-        dragSelection = { column, pointerId: event.pointerId, anchorMinute, pointerY: event.clientY, startY: event.clientY, didMove: false };
+        if (mode === 'visitor' && isPastSlot(column.dataset.date, minuteToClock(anchorMinute))) return;
+        dragSelection = { column, mode, pointerId: event.pointerId, anchorMinute, pointerY: event.clientY, startY: event.clientY, didMove: false };
         document.body.classList.add('dragging-calendar');
         try { column.setPointerCapture(event.pointerId); } catch {}
         paintDragSelection();
