@@ -335,6 +335,89 @@
       .calendar-event { left: 3px; right: 3px; padding: 4px; }
       .calendar-event strong { font-size: 8px; }
     }
+    @media (max-width: 760px) {
+      .main { min-height: 0; }
+      .topbar { align-items: center; }
+      .page-heading { align-items: stretch; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+      .page-heading > div:first-child { min-width: 0; }
+      .heading-actions { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+      .week-summary { white-space: normal; flex-wrap: wrap; }
+      .request-page .page-heading > .button { align-self: flex-start; }
+      .header-nav { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+      .header-nav::-webkit-scrollbar { display: none; }
+      .header-nav .nav-item { flex: none; }
+      .calendar-toolbar { min-width: 0; }
+      .week-nav { min-width: 0; gap: 6px; }
+      .week-title { min-width: 0; white-space: nowrap; }
+      .calendar-scroll { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+      .calendar-footer { gap: 8px 14px; flex-wrap: wrap; }
+      .legend { gap: 8px 12px; }
+      .request-page { padding-bottom: 12px; }
+      .request-card { min-width: 0; }
+      .request-card > div:nth-child(2) { min-width: 0; overflow-wrap: anywhere; }
+      .request-time { line-height: 1.5; }
+      .request-actions { justify-content: flex-start; }
+      .modal-backdrop { padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); overflow-y: auto; align-items: flex-start; }
+      .modal { width: min(440px, 100%); max-height: calc(100dvh - 20px); margin: auto; padding: 18px; }
+      .picker-panel, .date-picker-panel { width: min(290px, calc(100vw - 40px)); max-width: calc(100vw - 40px); }
+      .time-picker-panel { width: min(286px, calc(100vw - 40px)); }
+    }
+    @media (max-width: 560px) {
+      .main { padding: 0 12px 8px; }
+      .page-heading { align-items: stretch; flex-direction: column; gap: 10px; }
+      .page-heading > div:first-child { min-width: 0; }
+      .page-heading h1 { font-size: 22px; }
+      .subtitle { max-width: none; font-size: 11px; }
+      .heading-actions { width: 100%; justify-content: flex-end; }
+      .heading-actions .button { min-height: 38px; }
+      .modebar { align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+      .mode-note { line-height: 1.4; }
+      .calendar-toolbar { padding: 9px 8px; gap: 4px; }
+      .week-title { font-size: 9px; }
+      .toolbar-right { gap: 1px; }
+      .today-button { padding: 6px 4px; font-size: 9px; }
+      .calendar-footer { align-items: flex-start; flex-direction: column; padding: 9px 10px; font-size: 9px; }
+      .request-summary { align-items: flex-start; gap: 10px; padding: 13px; }
+      .request-summary p { line-height: 1.45; }
+      .request-page .page-heading { align-items: stretch; }
+      .request-page .page-heading > .button { align-self: flex-start; }
+      .modal-backdrop { padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
+      .modal { max-height: calc(100dvh - 16px); padding: 16px; border-radius: 11px; }
+      .type-options, .visibility-options { grid-template-columns: 1fr; }
+      .type-option label { padding: 10px; }
+      .type-option span { font-size: 9px; }
+      .visibility-option label { padding: 9px; }
+    }
+    @media (max-width: 390px) {
+      .main { padding-right: 9px; padding-left: 9px; }
+      .header-brand { gap: 8px; font-size: 19px; }
+      .brand-mark { transform: translateY(-1px) scale(.92); transform-origin: left center; margin-right: -2px; }
+      .topbar-right { gap: 5px; }
+      .auth-button { height: 32px; padding: 0 9px; font-size: 10px; }
+      .header-nav .nav-item { padding: 7px 6px; font-size: 9px; }
+      .heading-actions .button { padding: 0 10px; font-size: 10px; }
+      .week-summary { display: none !important; }
+      .request-card { padding: 12px; gap: 9px; }
+      .request-actions { grid-column: 1 / -1; }
+      .request-actions .button { flex: 1 1 auto; }
+      .form-grid { grid-template-columns: minmax(0, 1fr); }
+      .form-grid .field { grid-column: 1 / -1; }
+      .modal-head { gap: 8px; }
+      .modal-head h2 { font-size: 16px; }
+      .modal-actions { align-items: stretch; flex-wrap: wrap; }
+      .modal-actions > span:empty { display: none; }
+      .modal-actions .right-actions { width: 100%; margin-left: 0; }
+      .modal-actions .right-actions .button { flex: 1; }
+      #delete-slot:not([hidden]) { flex: 1 0 100%; }
+    }
+    @media (max-height: 620px) and (max-width: 760px) {
+      .topbar { padding-top: 5px; padding-bottom: 5px; margin-bottom: 8px; }
+      .page-heading { margin-bottom: 8px; }
+      .page-heading .subtitle { margin-top: 5px; }
+      .modebar { margin-bottom: 7px; }
+      .calendar-card { min-height: 100px; }
+      .calendar-footer { padding-top: 6px; padding-bottom: 6px; }
+    }
   </style>
 </head>
 <body>
