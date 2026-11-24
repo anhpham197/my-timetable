@@ -340,9 +340,12 @@
       .topbar { align-items: center; }
       .page-heading { align-items: stretch; flex-direction: column; gap: 10px; margin-bottom: 12px; }
       .page-heading > div:first-child { min-width: 0; }
-      .heading-actions { width: 100%; justify-content: space-between; flex-wrap: wrap; }
-      .week-summary { white-space: normal; flex-wrap: wrap; }
+      .heading-actions { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+      .heading-actions .button { width: 100%; min-height: 42px; }
+      .week-summary { width: 100%; justify-content: space-between; white-space: nowrap; flex-wrap: nowrap; margin: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: white; }
       .request-page .page-heading > .button { align-self: flex-start; }
+      .timezone { display: flex; gap: 6px; padding: 6px 9px; font-size: 10px; }
+      .timezone svg { width: 13px; height: 13px; }
       .header-nav { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
       .header-nav::-webkit-scrollbar { display: none; }
       .header-nav .nav-item { flex: none; }
@@ -396,7 +399,9 @@
       .auth-button { height: 32px; padding: 0 9px; font-size: 10px; }
       .header-nav .nav-item { padding: 7px 6px; font-size: 9px; }
       .heading-actions .button { padding: 0 10px; font-size: 10px; }
-      .week-summary { display: none !important; }
+      .week-summary { display: flex !important; font-size: 9px; gap: 6px; padding: 8px 9px; }
+      .timezone { gap: 4px; padding: 5px 7px; font-size: 9px; }
+      .timezone svg { width: 12px; height: 12px; }
       .request-card { padding: 12px; gap: 9px; }
       .request-actions { grid-column: 1 / -1; }
       .request-actions .button { flex: 1 1 auto; }
